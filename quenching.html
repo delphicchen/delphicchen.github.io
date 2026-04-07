@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>鋼帶冷卻技術比較：DQ vs ACC</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #f8fafc; /* Bright theme background */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        canvas {
+            border-radius: 0.5rem;
+            background: linear-gradient(to bottom, #e2e8f0 0%, #cbd5e1 100%);
+            box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
+        }
+        .progress-bar {
+            transition: width 0.1s linear, background-color 0.1s linear;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center py-10 px-4 bg-slate-50">
+
+    <div class="max-w-6xl w-full relative">
+        <!-- Comparison Section -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
+            
+            <!-- ACC Panel (Moved to Left) -->
+            <div class="bg-white rounded-2xl shadow-xl p-6 border-t-4 border-teal-500 flex flex-col h-full w-full">
+                <div class="mb-4">
+                    <h2 id="accTitle" class="text-2xl font-bold text-slate-800 cursor-pointer hover:text-teal-600 transition-colors flex items-center gap-2 group" title="點擊重新播放">
+                        ACC 層流冷卻
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 opacity-50 group-hover:opacity-100 group-hover:rotate-180 transition-all duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                    </h2>
+                    <div class="inline-block mt-2 px-3 py-1 bg-yellow-200 text-yellow-800 text-base font-bold rounded-full">
+                        膜沸騰造成熱傳受限
+                    </div>
+                </div>
+                <div class="relative w-full aspect-video mb-4">
+                    <canvas id="accCanvas" class="w-full h-full"></canvas>
+                </div>
+                <div class="mt-auto">
+                    <div class="flex justify-between text-base font-semibold text-slate-700 mb-1">
+                        <span>鋼板溫度</span>
+                        <span id="accTempText">1000°C</span>
+                    </div>
+                    <div class="w-full bg-slate-200 rounded-full h-4 overflow-hidden mb-3">
+                        <div id="accTempBar" class="progress-bar h-4 rounded-full bg-red-600" style="width: 100%;"></div>
+                    </div>
+                    <!-- 放大字體至 text-lg -->
+                    <p class="text-lg text-slate-700 font-medium leading-relaxed min-h-[4rem]">水流壓力較低，高溫使水瞬間氣化形成「蒸氣膜」（膜沸騰），阻隔了水與鋼板的接觸，冷卻效率低。</p>
+                </div>
+            </div>
+
+            <!-- DQ Panel (Moved to Right) -->
+            <div class="bg-white rounded-2xl shadow-xl p-6 border-t-4 border-blue-600 flex flex-col h-full w-full">
+                <div class="mb-4">
+                    <h2 id="dqTitle" class="text-2xl font-bold text-slate-800 cursor-pointer hover:text-blue-600 transition-colors flex items-center gap-2 group" title="點擊重新播放">
+                        DQ 新一代超快冷
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 opacity-50 group-hover:opacity-100 group-hover:rotate-180 transition-all duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                    </h2>
+                    <div class="inline-block mt-2 px-3 py-1 bg-yellow-200 text-yellow-800 text-base font-bold rounded-full">
+                        高壓水柱使核沸騰主導熱傳
+                    </div>
+                </div>
+                <div class="relative w-full aspect-video mb-4">
+                    <canvas id="dqCanvas" class="w-full h-full"></canvas>
+                </div>
+                <div class="mt-auto">
+                    <div class="flex justify-between text-base font-semibold text-slate-700 mb-1">
+                        <span>鋼板溫度</span>
+                        <span id="dqTempText">1000°C</span>
+                    </div>
+                    <div class="w-full bg-slate-200 rounded-full h-4 overflow-hidden mb-3">
+                        <div id="dqTempBar" class="progress-bar h-4 rounded-full bg-red-600" style="width: 100%;"></div>
+                    </div>
+                    <!-- 放大字體至 text-lg -->
+                    <p class="text-lg text-slate-700 font-medium leading-relaxed min-h-[4rem]">高壓水流沖破蒸氣層，水直接接觸高溫鋼板（核沸騰），帶走大量熱能，冷卻極快。</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        class CoolingSimulation {
+            constructor(canvasId, type, uiElements) {
+                this.canvas = document.getElementById(canvasId);
+                this.ctx = this.canvas.getContext('2d');
+                this.type = type; // 'DQ' or 'ACC'
+                this.ui = uiElements;
+                
+                // Set canvas internal resolution
+                this.canvas.width = 600;
+                this.canvas.height = 400;
+                
+                this.reset();
+            }
+
+            reset() {
+                this.temperature = 1000;
+                this.particles = [];
+                this.steamParticles = [];
+                this.isActive = true;
+                this.isCooling = true;
+                
+                // Nozzle positions
+                this.nozzles = this.type === 'DQ' 
+                    ? [100, 200, 300, 400, 500] 
+                    : [150, 450]; 
+            }
+
+            getPlateColor() {
+                const ratio = this.temperature / 1000;
+                const r = Math.floor(100 + 155 * ratio); 
+                const g = Math.floor(100 - 100 * ratio); 
+                const b = Math.floor(110 - 110 * ratio); 
+                return `rgb(${r}, ${g}, ${b})`;
+            }
+
+            update() {
+                if (!this.isActive) return;
+
+                // 【邏輯修正】：將溫度下降與水滴碰撞次數脫鉤，直接透過幀數控制，確保完美的 2:1 速率
+                if (this.isCooling && this.temperature > 30) {
+                    if (this.type === 'DQ') {
+                        this.temperature -= 2.0; // DQ 固定每幀下降 2.0 度 (約 8 秒冷卻完畢)
+                    } else {
+                        this.temperature -= 1.0; // ACC 固定每幀下降 1.0 度 (精準的一半，約 16 秒冷卻完畢)
+                    }
+                }
+
+                // 1. Spawn Water Particles (V1 style dynamic flow)
+                if (this.isCooling && (this.temperature > 100 || Math.random() > 0.5)) {
+                    this.nozzles.forEach(x => {
+                        if (this.type === 'DQ') {
+                            // High pressure: fast, narrow streams, HIGH DENSITY
+                            for(let d=0; d<3; d++) { // Generate 3x particles per frame
+                                if (Math.random() > 0.05) {
+                                    this.particles.push({
+                                        x: x + (Math.random() * 30 - 15),
+                                        y: 0,
+                                        vy: 14 + Math.random() * 6, // Faster drop
+                                        width: 3 + Math.random() * 2, // Thicker drops
+                                        height: 25 + Math.random() * 15,
+                                        type: 'water'
+                                    });
+                                }
+                            }
+                        } else {
+                            // Laminar: slower, wider streams
+                            if (Math.random() > 0.3) {
+                                this.particles.push({
+                                    x: x + (Math.random() * 80 - 40),
+                                    y: 0,
+                                    vy: 5 + Math.random() * 2,
+                                    width: 6,
+                                    height: 15,
+                                    type: 'water'
+                                });
+                            }
+                        }
+                    });
+                }
+
+                // Plate surface level
+                const plateY = 360;
+                // Vapor layer thickness
+                const vaporThickness = (this.temperature > 150) ? (this.type === 'ACC' ? 25 : 15) : 0;
+                // DQ pierces vapor, so impact is at plate. ACC impact is at vapor surface.
+                const impactY = this.type === 'DQ' ? plateY : plateY - vaporThickness;
+
+                // 2. Update Particles
+                for (let i = this.particles.length - 1; i >= 0; i--) {
+                    let p = this.particles[i];
+                    p.y += p.vy;
+
+                    // Collision with surface or vapor layer
+                    if (p.y > impactY) {
+                        if (this.type === 'DQ') {
+                            // Nuclear boiling: pierces film, splashes and cools directly
+                            if (this.temperature > 100) {
+                                // Splash (water) - 溫度計算已移至上方，此處僅保留視覺特效
+                                for(let j=0; j<2; j++) {
+                                    this.steamParticles.push({
+                                        x: p.x, y: plateY,
+                                        vx: (Math.random() - 0.5) * 6,
+                                        vy: -Math.random() * 4 - 2,
+                                        life: 1.0,
+                                        isWater: true
+                                    });
+                                }
+                                // Some steam from piercing the film
+                                if (Math.random() > 0.7) {
+                                    this.steamParticles.push({
+                                        x: p.x, y: plateY - 10,
+                                        vx: (Math.random() - 0.5) * 3,
+                                        vy: -Math.random() * 3,
+                                        life: 1.0,
+                                        isWater: false
+                                    });
+                                }
+                            }
+                        } else {
+                            // Film boiling: hits steam film, steam forms, slower cooling
+                            if (this.temperature > 100) {
+                                // 溫度計算已移至上方，此處僅保留視覺特效
+                                if (Math.random() > 0.5) {
+                                    this.steamParticles.push({
+                                        x: p.x + (Math.random()*40-20), 
+                                        y: impactY,
+                                        vx: (Math.random() - 0.5) * 4,
+                                        vy: -Math.random() * 2,
+                                        life: 1.0,
+                                        isWater: false
+                                    });
+                                }
+                            }
+                        }
+                        this.particles.splice(i, 1);
+                    }
+                }
+
+                // Stop generating water and cap temperature when cooled down
+                if (this.temperature <= 30) {
+                    this.temperature = 30;
+                    this.isCooling = false;
+                }
+
+                // 3. Update Steam/Splash
+                for (let i = this.steamParticles.length - 1; i >= 0; i--) {
+                    let sp = this.steamParticles[i];
+                    sp.x += sp.vx;
+                    sp.y += sp.vy;
+                    sp.life -= (sp.isWater ? 0.05 : 0.02);
+                    
+                    if (sp.life <= 0) {
+                        this.steamParticles.splice(i, 1);
+                    }
+                }
+
+                // Update UI
+                this.ui.tempText.innerText = Math.round(this.temperature) + '°C';
+                const ratio = Math.max(0, (this.temperature - 30) / 970) * 100;
+                this.ui.tempBar.style.width = ratio + '%';
+                
+                if (this.temperature < 300) this.ui.tempBar.style.backgroundColor = '#10b981'; 
+                else if (this.temperature < 600) this.ui.tempBar.style.backgroundColor = '#f59e0b'; 
+                else this.ui.tempBar.style.backgroundColor = '#dc2626'; 
+            }
+
+            draw() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+                // Draw vapor film for BOTH (DQ is pierced by water later)
+                if (this.temperature > 150) {
+                    const vaporThickness = this.type === 'ACC' ? 25 : 15;
+                    const vaporY = 360 - vaporThickness;
+                    
+                    this.ctx.fillStyle = `rgba(253, 224, 71, ${Math.min(0.8, this.temperature/1000)})`; // Yellowish steam
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(0, 360);
+                    for (let x = 0; x <= this.canvas.width; x += 10) {
+                        let yOffset = Math.sin(Date.now() / 150 + x) * 4;
+                        this.ctx.lineTo(x, vaporY + yOffset);
+                    }
+                    this.ctx.lineTo(this.canvas.width, 360);
+                    this.ctx.fill();
+                }
+
+                // Draw Nozzles
+                this.ctx.fillStyle = '#1e293b';
+                this.nozzles.forEach(x => {
+                    if (this.type === 'DQ') {
+                        // 較尖的 DQ 噴嘴
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(x - 20, 0); // 頂部左邊
+                        this.ctx.lineTo(x + 20, 0); // 頂部右邊
+                        this.ctx.lineTo(x + 8, 25); // 底部尖端右邊
+                        this.ctx.lineTo(x - 8, 25); // 底部尖端左邊
+                        this.ctx.fill();
+                    } else {
+                        // ACC 平底寬噴嘴
+                        const width = 100;
+                        this.ctx.fillRect(x - width/2, 0, width, 20);
+                    }
+                });
+
+                // Draw Water Particles (V1 Style)
+                this.ctx.fillStyle = '#0ea5e9'; // Tailwind sky-500
+                this.particles.forEach(p => {
+                    this.ctx.fillRect(p.x, p.y, p.width, p.height);
+                });
+
+                // Draw Steam/Splash Particles
+                this.steamParticles.forEach(sp => {
+                    this.ctx.beginPath();
+                    this.ctx.arc(sp.x, sp.y, sp.isWater ? 3 : 8, 0, Math.PI * 2);
+                    if (sp.isWater) {
+                        this.ctx.fillStyle = `rgba(14, 165, 233, ${sp.life})`; // blue splash
+                    } else {
+                        this.ctx.fillStyle = `rgba(255, 255, 255, ${sp.life * 0.6})`; // white steam
+                    }
+                    this.ctx.fill();
+                });
+
+                // Draw Hot Plate
+                this.ctx.fillStyle = this.getPlateColor();
+                this.ctx.fillRect(0, 360, this.canvas.width, 40);
+                
+                // Plate Glow
+                if (this.temperature > 100) {
+                    this.ctx.fillStyle = `rgba(255, 255, 0, ${(this.temperature/1000) * 0.2})`;
+                    this.ctx.fillRect(0, 360, this.canvas.width, 5);
+                }
+            }
+
+            loop() {
+                this.update();
+                this.draw();
+            }
+        }
+
+        // Initialize simulations
+        const dqSim = new CoolingSimulation('dqCanvas', 'DQ', {
+            tempText: document.getElementById('dqTempText'),
+            tempBar: document.getElementById('dqTempBar')
+        });
+
+        const accSim = new CoolingSimulation('accCanvas', 'ACC', {
+            tempText: document.getElementById('accTempText'),
+            tempBar: document.getElementById('accTempBar')
+        });
+
+        // Animation Loop
+        function animate() {
+            dqSim.loop();
+            accSim.loop();
+            requestAnimationFrame(animate);
+        }
+
+        // Title Replay Button Logic
+        const resetAll = () => {
+            dqSim.reset();
+            accSim.reset();
+        };
+
+        document.getElementById('dqTitle').addEventListener('click', resetAll);
+        document.getElementById('accTitle').addEventListener('click', resetAll);
+
+        // Start animation
+        animate();
+    </script>
+</body>
+</html>
