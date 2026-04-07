@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>水的沸騰曲線與熱傳模式 (明亮版)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #f8fafc; color: #1e293b; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
+        /* 滑桿樣式調整為明亮主題適配 */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: #ef4444;
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: -6px;
+            box-shadow: 0 2px 4px rgba(239, 68, 68, 0.4);
+            border: 2px solid #fff;
+            transition: transform 0.1s;
+        }
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body class="flex flex-col h-screen">
+
+    <!-- 上半部 (佔比 70%)：曲線與動畫 -->
+    <div class="flex-[7] flex flex-col md:flex-row min-h-0 shadow-sm z-10 border-b border-slate-200 relative">
+        
+        <!-- 左上 (50%)：池沸騰曲線與控制介面 -->
+        <div class="flex-1 flex flex-col p-6 md:p-8 border-r border-slate-200 bg-white">
+            <div class="mb-2">
+                <h1 class="text-2xl font-extrabold text-blue-600 mb-1">水的熱傳行為</h1>
+            </div>
+
+            <!-- 動態沸騰曲線容器 -->
+            <div id="curveContainer" class="flex-1 relative w-full my-4 bg-slate-50 rounded-xl border border-slate-100 overflow-hidden flex flex-col pt-2">
+                <p class="text-xs text-center text-slate-400 font-semibold absolute w-full top-2 pointer-events-none">沸騰曲線 (Boiling Curve)</p>
+                <canvas id="curveCanvas" class="w-full h-full"></canvas>
+            </div>
+
+            <!-- 控制區塊 (極簡版：一條線與點) -->
+            <div class="flex items-center gap-4 mt-2">
+                <input type="range" id="tempSlider" min="0" max="100" step="0.1" value="0" class="flex-1">
+                <button id="nextBtn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-xl shadow-md transition-all active:scale-95 flex items-center gap-2 whitespace-nowrap text-sm">
+                    下一階段 
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 4 15 12 5 20 5 4"></polygon><line x1="19" y1="5" x2="19" y2="19"></line></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- 右上 (50%)：燒杯動畫 -->
+        <div class="flex-1 relative bg-sky-50 overflow-hidden flex items-center justify-center">
+            <canvas id="simulationCanvas" class="absolute inset-0 w-full h-full"></canvas>
+            
+            <!-- 溫度標籤 (明亮主題配色) -->
+            <div class="absolute top-8 right-8 flex flex-col items-end pointer-events-none bg-white/70 backdrop-blur-sm p-3 rounded-xl border border-white shadow-sm">
+                <div class="text-slate-500 text-sm font-semibold">水的飽和溫度 (T<sub>sat</sub>)</div>
+                <div class="text-3xl font-black text-blue-500">100 °C</div>
+            </div>
+            
+            <span id="heaterTempDisplay" class="hidden"></span>
+        </div>
+    </div>
+
+    <!-- 下半部 (佔比 30%)：大字體階段說明，左右 30:70 分欄 -->
+    <div class="flex-[3] bg-white overflow-y-auto flex relative">
+        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400 via-green-400 to-purple-400 opacity-50"></div>
+
+        <!-- 左側 30%：階段徽章 + 主標題 -->
+        <div class="w-[30%] flex flex-col justify-center items-center border-r border-slate-200 px-6 py-4 text-center">
+            <div class="mb-2">
+                <span id="stageBadge" class="text-sm font-bold bg-blue-100 text-blue-700 px-3 py-1 rounded-full uppercase tracking-wider">階段 I</span>
+            </div>
+            <h2 id="stageTitle" class="text-xl md:text-2xl font-extrabold text-slate-900 leading-snug transition-colors">
+                自然對流 (Free Convection)
+            </h2>
+        </div>
+
+        <!-- 右側 70%：主導熱傳 + 說明文字 -->
+        <div class="w-[70%] flex flex-col justify-center px-8 py-4">
+            <div class="text-lg md:text-xl text-slate-800 font-semibold mb-3">
+                主導熱傳：<span id="heatTransferMode" class="text-blue-600 font-bold border-b-2 border-blue-300 pb-1">單相自然對流</span>
+            </div>
+            <p id="stageDescription" class="text-base md:text-lg text-slate-900 leading-relaxed font-medium">
+                液體受熱膨脹上升，較冷的液體下降形成自然對流。加熱表面沒有氣泡產生。
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // --- DOM 元素與全域變數 ---
+        const slider = document.getElementById('tempSlider');
+        const nextBtn = document.getElementById('nextBtn');
+        const heaterTempDisplay = document.getElementById('heaterTempDisplay');
+        
+        const stageTitle = document.getElementById('stageTitle');
+        const stageBadge = document.getElementById('stageBadge');
+        const heatTransferMode = document.getElementById('heatTransferMode');
+        const stageDescription = document.getElementById('stageDescription');
+        
+        const simCanvas = document.getElementById('simulationCanvas');
+        const simCtx = simCanvas.getContext('2d');
+        const curveContainer = document.getElementById('curveContainer');
+        const curveCanvas = document.getElementById('curveCanvas');
+        const curveCtx = curveCanvas.getContext('2d');
+
+        let currentStage = 1;
+        let deltaT = 0;
+        let bubbles = [];
+        let particles = [];
+        let animationId;
+        let isAnimatingSlider = false;
+
+        // --- 設定 Canvas 大小 ---
+        function resizeCanvas() {
+            simCanvas.width = simCanvas.parentElement.clientWidth;
+            simCanvas.height = simCanvas.parentElement.clientHeight;
+            
+            if(curveContainer) {
+                curveCanvas.width = curveContainer.clientWidth;
+                curveCanvas.height = curveContainer.clientHeight;
+                drawCurve(); // 重新繪製曲線適應新大小
+            }
+        }
+        window.addEventListener('resize', resizeCanvas);
+        // 初始化延遲一下確保 container 已經取得大小
+        setTimeout(resizeCanvas, 0); 
+
+        // --- 狀態映射邏輯 ---
+        const stagesData = [
+            { // Stage 1
+                maxSlider: 25,
+                title: "自然對流區 (Free Convection)",
+                mode: "單相自然對流",
+                desc: "過熱溫差 ΔT < 5°C。水主要透過自然對流傳熱，表面無氣泡產生，熱傳效率較低。",
+                textColor: "text-blue-600",
+                badgeClass: "bg-blue-100 text-blue-700",
+                tRange: [0, 5],
+                badgeText: "階段 I"
+            },
+            { // Stage 2
+                maxSlider: 50,
+                title: "核沸騰區 (Nucleate Boiling)",
+                mode: "氣泡攪拌與核沸騰",
+                desc: "5°C < ΔT < 30°C。表面開始產生大量氣泡，氣泡的脫離劇烈攪動液體，使熱傳效率急劇上升，達最高點為「臨界熱通量(CHF)」。",
+                textColor: "text-green-600",
+                badgeClass: "bg-green-100 text-green-700",
+                tRange: [5, 30],
+                badgeText: "階段 II"
+            },
+            { // Stage 3
+                maxSlider: 75,
+                title: "過渡區沸騰 (Transition Boiling)",
+                mode: "不穩定局部蒸氣膜",
+                desc: "30°C < ΔT < 120°C。氣泡產生極快並連成局部蒸氣膜。因蒸氣導熱性差，阻礙熱傳，導致整體熱通量隨溫度上升而反轉下降。",
+                textColor: "text-orange-500",
+                badgeClass: "bg-orange-100 text-orange-700",
+                tRange: [30, 120],
+                badgeText: "階段 III"
+            },
+            { // Stage 4
+                maxSlider: 100,
+                title: "膜沸騰區 (Film Boiling)",
+                mode: "蒸氣膜熱傳導與輻射",
+                desc: "ΔT > 120°C。表面被穩定的連續蒸氣膜覆蓋。熱量主要靠傳導與輻射穿透蒸氣層，隨溫度升高，輻射效應使熱通量再次緩慢上升。",
+                textColor: "text-purple-600",
+                badgeClass: "bg-purple-100 text-purple-700",
+                tRange: [120, 1000],
+                badgeText: "階段 IV"
+            }
+        ];
+
+        function mapValue(val, inMin, inMax, outMin, outMax) {
+            return (val - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
+        }
+
+        function updateState() {
+            const val = parseFloat(slider.value);
+            let stageIdx = 0;
+            let stageStart = 0;
+            
+            for (let i = 0; i < stagesData.length; i++) {
+                if (val <= stagesData[i].maxSlider) {
+                    stageIdx = i;
+                    break;
+                }
+                stageStart = stagesData[i].maxSlider;
+            }
+
+            const stage = stagesData[stageIdx];
+            currentStage = stageIdx + 1;
+            
+            // 計算真實的 Delta T
+            let currentTRange = stage.tRange;
+            deltaT = mapValue(val, stageStart, stage.maxSlider, currentTRange[0], currentTRange[1]);
+            
+            // 更新 UI 文字
+            heaterTempDisplay.innerText = `${100 + Math.round(deltaT)} °C`;
+            
+            // 更新下方大字體說明
+            stageTitle.innerText = stage.title;
+            stageBadge.innerText = stage.badgeText;
+            stageBadge.className = `text-sm font-bold px-3 py-1 rounded-full uppercase tracking-wider ${stage.badgeClass}`;
+            
+            heatTransferMode.innerText = stage.mode;
+            heatTransferMode.className = `font-bold border-b-2 pb-1 ${stage.textColor} border-${stage.textColor.split('-')[1]}-200`;
+            stageDescription.innerText = stage.desc;
+
+            drawCurve();
+        }
+
+        slider.addEventListener('input', () => {
+            if(!isAnimatingSlider) updateState();
+        });
+
+        // --- 自動進入下一階段動畫按鈕 ---
+        nextBtn.addEventListener('click', () => {
+            if (isAnimatingSlider) return;
+            
+            let currentVal = parseFloat(slider.value);
+            let targetVal;
+            
+            // 設定目標值為下一個階段的中心點
+            if (currentVal < 25) targetVal = 37.5;       // 去階段 2
+            else if (currentVal < 50) targetVal = 62.5;  // 去階段 3
+            else if (currentVal < 75) targetVal = 87.5;  // 去階段 4
+            else targetVal = 0;                          // 回到階段 1
+            
+            isAnimatingSlider = true;
+            nextBtn.disabled = true;
+            nextBtn.classList.add('opacity-75', 'cursor-not-allowed');
+
+            let duration = 1000; // 1秒過渡
+            let startTime = null;
+            let startVal = currentVal;
+            let change = targetVal - startVal;
+
+            // 緩動函數 (Ease in out cubic)
+            function easeInOutCubic(t, b, c, d) {
+                t /= d/2;
+                if (t < 1) return c/2*t*t*t + b;
+                t -= 2;
+                return c/2*(t*t*t + 2) + b;
+            }
+
+            function animateSlider(timestamp) {
+                if (!startTime) startTime = timestamp;
+                let progress = timestamp - startTime;
+                
+                if (progress < duration) {
+                    slider.value = easeInOutCubic(progress, startVal, change, duration);
+                    updateState();
+                    requestAnimationFrame(animateSlider);
+                } else {
+                    slider.value = targetVal;
+                    updateState();
+                    isAnimatingSlider = false;
+                    nextBtn.disabled = false;
+                    nextBtn.classList.remove('opacity-75', 'cursor-not-allowed');
+                }
+            }
+            requestAnimationFrame(animateSlider);
+        });
+
+        // --- 繪製沸騰曲線小圖 (明亮主題) ---
+        function drawCurve() {
+            const w = curveCanvas.width;
+            const h = curveCanvas.height;
+            if(w === 0 || h === 0) return;
+
+            curveCtx.clearRect(0, 0, w, h);
+
+            // 網格線 (淺灰色)
+            curveCtx.strokeStyle = 'rgba(0,0,0,0.04)';
+            curveCtx.lineWidth = 1;
+            for(let i=1; i<10; i++) {
+                curveCtx.beginPath(); curveCtx.moveTo(i*w/10, 0); curveCtx.lineTo(i*w/10, h); curveCtx.stroke();
+                curveCtx.beginPath(); curveCtx.moveTo(0, i*h/10); curveCtx.lineTo(w, i*h/10); curveCtx.stroke();
+            }
+
+            // 座標軸 (深藍灰)
+            const paddingX = 55;
+            const paddingYBottom = 34;
+            const paddingYTop = 20;
+
+            curveCtx.strokeStyle = '#64748b';
+            curveCtx.lineWidth = 2;
+            curveCtx.beginPath();
+            curveCtx.moveTo(paddingX, paddingYTop); 
+            curveCtx.lineTo(paddingX, h - paddingYBottom); 
+            curveCtx.lineTo(w - 10, h - paddingYBottom);
+            curveCtx.stroke();
+            
+            // 標籤
+            curveCtx.fillStyle = '#000000';
+            curveCtx.font = 'bold 15px sans-serif';
+            curveCtx.textAlign = 'center';
+            curveCtx.fillText("ΔT excess (過熱度)", w/2, h - 6);
+            curveCtx.textAlign = 'left';
+            curveCtx.save();
+            curveCtx.translate(14, h/2);
+            curveCtx.rotate(-Math.PI/2);
+            curveCtx.textAlign = 'center';
+            curveCtx.fillText("Heat Flux (熱通量)", 0, 0);
+            curveCtx.restore();
+            curveCtx.textAlign = 'left';
+
+            // 繪製區段背景顏色 (可選，增加可讀性)
+            const drawWidth = w - paddingX - 20;
+            const drawHeight = h - paddingYBottom - paddingYTop;
+            
+            curveCtx.fillStyle = 'rgba(59, 130, 246, 0.10)'; // Stage 1 bg
+            curveCtx.fillRect(paddingX, paddingYTop, drawWidth*0.25, drawHeight);
+            curveCtx.fillStyle = 'rgba(34, 197, 94, 0.10)'; // Stage 2 bg
+            curveCtx.fillRect(paddingX + drawWidth*0.25, paddingYTop, drawWidth*0.25, drawHeight);
+            curveCtx.fillStyle = 'rgba(249, 115, 22, 0.10)'; // Stage 3 bg
+            curveCtx.fillRect(paddingX + drawWidth*0.5, paddingYTop, drawWidth*0.25, drawHeight);
+            curveCtx.fillStyle = 'rgba(168, 85, 247, 0.12)'; // Stage 4 bg
+            curveCtx.fillRect(paddingX + drawWidth*0.75, paddingYTop, drawWidth*0.25, drawHeight);
+
+            // 定義曲線關鍵點
+            const pts = [
+                {x: paddingX, y: h - paddingYBottom},                                       // Origin
+                {x: paddingX + drawWidth*0.25, y: h - paddingYBottom - drawHeight*0.15},    // A (Free Convection end)
+                {x: paddingX + drawWidth*0.50, y: paddingYTop + drawHeight*0.1},            // C (CHF - Peak)
+                {x: paddingX + drawWidth*0.75, y: h - paddingYBottom - drawHeight*0.25},    // D (Leidenfrost - Min)
+                {x: paddingX + drawWidth, y: paddingYTop + drawHeight*0.05}                 // E (Film boiling end)
+            ];
+
+            // 繪製主曲線 (Catmull-Rom 平滑插值)
+            curveCtx.strokeStyle = '#0284c7';
+            curveCtx.lineWidth = 4;
+            curveCtx.lineCap = 'round';
+            curveCtx.lineJoin = 'round';
+            curveCtx.beginPath();
+            curveCtx.moveTo(pts[0].x, pts[0].y);
+
+            // 建立帶頭尾幻象點的 Catmull-Rom → Bezier 轉換
+            const phantomStart = {x: 2*pts[0].x - pts[1].x, y: 2*pts[0].y - pts[1].y};
+            const phantomEnd   = {x: 2*pts[pts.length-1].x - pts[pts.length-2].x,
+                                   y: 2*pts[pts.length-1].y - pts[pts.length-2].y};
+            const allPts = [phantomStart, ...pts, phantomEnd];
+            for (let i = 0; i < pts.length - 1; i++) {
+                const p0 = allPts[i], p1 = allPts[i+1], p2 = allPts[i+2], p3 = allPts[i+3];
+                const cp1x = p1.x + (p2.x - p0.x) / 6;
+                const cp1y = p1.y + (p2.y - p0.y) / 6;
+                const cp2x = p2.x - (p3.x - p1.x) / 6;
+                const cp2y = p2.y - (p3.y - p1.y) / 6;
+                curveCtx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
+            }
+            curveCtx.stroke();
+
+            // 繪製當前位置的紅點指示器
+            const val = parseFloat(slider.value);
+            const currentX = paddingX + drawWidth * (val / 100);
+            
+            // 精確 Y 值：與繪製曲線完全相同的 Catmull-Rom Bezier 插值
+            let segIdx, segT;
+            if      (val <= 25) { segIdx = 0; segT = val / 25; }
+            else if (val <= 50) { segIdx = 1; segT = (val - 25) / 25; }
+            else if (val <= 75) { segIdx = 2; segT = (val - 50) / 25; }
+            else                { segIdx = 3; segT = (val - 75) / 25; }
+
+            const _p0 = allPts[segIdx], _p1 = allPts[segIdx+1],
+                  _p2 = allPts[segIdx+2], _p3 = allPts[segIdx+3];
+            const _cp1y = _p1.y + (_p2.y - _p0.y) / 6;
+            const _cp2y = _p2.y - (_p3.y - _p1.y) / 6;
+            const _mt = 1 - segT;
+            let currentY = _mt*_mt*_mt*_p1.y + 3*_mt*_mt*segT*_cp1y
+                         + 3*_mt*segT*segT*_cp2y + segT*segT*segT*_p2.y;
+
+            // 畫點的陰影與外框
+            curveCtx.shadowColor = 'rgba(239, 68, 68, 0.6)';
+            curveCtx.shadowBlur = 8;
+            curveCtx.fillStyle = '#ef4444';
+            curveCtx.beginPath();
+            curveCtx.arc(currentX, currentY, 6, 0, Math.PI*2);
+            curveCtx.fill();
+            curveCtx.shadowBlur = 0; // 重置
+            
+            curveCtx.strokeStyle = '#ffffff';
+            curveCtx.lineWidth = 2;
+            curveCtx.stroke();
+            
+            // 畫一條虛線對齊 X 軸
+            curveCtx.beginPath();
+            curveCtx.setLineDash([4, 4]);
+            curveCtx.moveTo(currentX, currentY);
+            curveCtx.lineTo(currentX, h - paddingYBottom);
+            curveCtx.strokeStyle = 'rgba(239, 68, 68, 0.5)';
+            curveCtx.lineWidth = 1;
+            curveCtx.stroke();
+            curveCtx.setLineDash([]);
+        }
+
+        // --- 物理模擬與 Canvas 繪製 ---
+        class Bubble {
+            constructor(x, y, radius, speedY, speedX, isVaporPatch = false, flatness = 0) {
+                this.x = x;
+                this.y = y;
+                this.radius = radius;
+                this.baseRadius = radius;
+                this.speedY = speedY;
+                this.speedX = speedX;
+                this.isVaporPatch = isVaporPatch;
+                // flatness: 1.0 = 極扁平橢圓 (剛從底部蒸氣膜脫離), 0.0 = 圓形
+                this.flatness = flatness;
+                this.birthY = y;
+                this.wobble = Math.random() * Math.PI * 2;
+                this.markedForDeletion = false;
+                this.opacity = 0.85;
+            }
+
+            update() {
+                this.y -= this.speedY;
+                this.x += this.speedX + Math.sin(this.wobble) * 0.5;
+                this.wobble += 0.15;
+
+                // 氣泡上升膨脹
+                if(!this.isVaporPatch) {
+                    this.radius = this.baseRadius * (1 + (simCanvas.height - this.y) / simCanvas.height * 0.6);
+                    // 過渡沸騰氣泡：隨上升高度逐漸由扁平橢圓變為圓形
+                    // 上升約 80px 後 flatness 降為 0（完全圓形）
+                    if(this.flatness > 0) {
+                        let risen = this.birthY - this.y;
+                        this.flatness = Math.max(0, 1 - risen / 80);
+                    }
+                }
+
+                if (this.y < simCanvas.height * 0.3) {
+                    this.markedForDeletion = true; // 到達水面
+                }
+
+                if(this.isVaporPatch) {
+                   // 底部扁平蒸氣膜塊：快速消散（過渡沸騰特徵：蒸氣膜不穩定，瞬間崩塌）
+                   this.opacity -= 0.022;
+                   this.radius += 0.4; // 橫向略微擴張後消失
+                   if(this.opacity <= 0) this.markedForDeletion = true;
+                }
+            }
+
+            draw(ctx) {
+                ctx.beginPath();
+                if(this.isVaporPatch) {
+                    // 底部蒸氣膜塊：極扁平橢圓
+                    ctx.ellipse(this.x, this.y, this.radius * 2.8, this.radius * 0.55, 0, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(224, 242, 254, ${this.opacity})`;
+                    ctx.fill();
+                    ctx.strokeStyle = `rgba(125, 211, 252, ${this.opacity * 0.6})`;
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                } else if(this.flatness > 0) {
+                    // 上浮中的過渡沸騰氣泡：從扁平橢圓逐漸變為圓形
+                    let rx = this.radius * (1 + this.flatness * 1.6);  // 扁時水平較寬
+                    let ry = this.radius * (1 - this.flatness * 0.55); // 扁時垂直較矮
+                    ctx.ellipse(this.x, this.y, rx, ry, 0, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+                    ctx.fill();
+                    ctx.strokeStyle = `rgba(56, 189, 248, ${this.opacity})`;
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
+                } else {
+                    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+                    ctx.fill();
+                    ctx.strokeStyle = `rgba(56, 189, 248, ${this.opacity})`;
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
+                }
+            }
+        }
+
+        class StreamlineParticle {
+            constructor() {
+                this.progress = Math.random() * Math.PI * 2;
+                this.speed = 0.015 + Math.random() * 0.01;
+                this.isLeftCell = Math.random() > 0.5;
+                // 縮小 rx 並將中心分開，避免左右區重疊
+                this.rxRandom = 0.07 + Math.random() * 0.05;
+                this.ryRandom = 0.28 + Math.random() * 0.12;
+            }
+            update() {
+                this.progress += this.speed;
+            }
+            draw(ctx, bX, bW, bY, bBottom) {
+                // 左側圓心在 0.22，右側在 0.78，分隔明顯
+                let centerX = this.isLeftCell ? bX + bW * 0.22 : bX + bW * 0.78;
+                let centerY = (bY + 50 + bBottom) / 2;
+                let rx = bW * this.rxRandom;
+                let ry = (bBottom - (bY + 50)) * this.ryRandom;
+
+                // 左側逆時針（angle 遞減），右側順時針（angle 遞增）
+                let angle = this.isLeftCell ? -this.progress : this.progress;
+                let x = centerX + rx * Math.cos(angle);
+                let y = centerY + ry * Math.sin(angle);
+
+                // 計算速度方向，判斷是否上升
+                // dy/dt: 左側 = ry*cos(angle)*(-speed)；右側 = ry*cos(angle)*speed
+                let dydt = this.isLeftCell
+                    ? ry * Math.cos(angle) * (-this.speed)
+                    : ry * Math.cos(angle) * (this.speed);
+                let isGoingUp = dydt < 0;
+
+                let opacity = 0.75 * (1 - 0.3 * Math.sin(angle));
+                // 上升紅色，下降藍色
+                let color = isGoingUp
+                    ? `rgba(239, 68, 68, ${opacity})`
+                    : `rgba(59, 130, 246, ${opacity})`;
+
+                // 畫拖曳流線尾巴
+                ctx.beginPath();
+                ctx.lineCap = 'round';
+                ctx.moveTo(x, y);
+                for (let i = 1; i <= 12; i++) {
+                    let pastAngle = angle - (this.isLeftCell ? -this.speed : this.speed) * i * 1.5;
+                    let px = centerX + rx * Math.cos(pastAngle);
+                    let py = centerY + ry * Math.sin(pastAngle);
+                    ctx.lineTo(px, py);
+                }
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 2.5;
+                ctx.stroke();
+
+                // 在頭部畫箭頭
+                let dxdt = this.isLeftCell
+                    ? rx * Math.sin(angle) * this.speed
+                    : -rx * Math.sin(angle) * this.speed;
+                let arrowAngle = Math.atan2(dydt, dxdt);
+                let arrowSize = 8;
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                ctx.lineTo(
+                    x - arrowSize * Math.cos(arrowAngle - Math.PI / 6),
+                    y - arrowSize * Math.sin(arrowAngle - Math.PI / 6)
+                );
+                ctx.moveTo(x, y);
+                ctx.lineTo(
+                    x - arrowSize * Math.cos(arrowAngle + Math.PI / 6),
+                    y - arrowSize * Math.sin(arrowAngle + Math.PI / 6)
+                );
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+        }
+
+        // 初始化對流流線粒子
+        for(let i=0; i<30; i++) {
+            particles.push(new StreamlineParticle());
+        }
+
+        let vaporFilmHeight = 0;
+        let vaporFilmWobble = 0;
+
+        function animate() {
+            const w = simCanvas.width;
+            const h = simCanvas.height;
+            // 確保有抓到寬高
+            if(w === 0) {
+                 animationId = requestAnimationFrame(animate);
+                 return;
+            }
+
+            const beakerWidth = Math.min(400, w * 0.8);
+            const beakerX = w / 2 - beakerWidth / 2;
+            const beakerY = h * 0.2;
+            const beakerBottom = h * 0.85;
+
+            simCtx.clearRect(0, 0, w, h);
+
+            // 1. 繪製加熱器底座
+            const val = parseFloat(slider.value);
+            let r, g, b;
+            if (val <= 25) { r = mapValue(val, 0, 25, 120, 220); g = 40; b = 40; }
+            else if (val <= 50) { r = 255; g = mapValue(val, 25, 50, 40, 120); b = 40; }
+            else if (val <= 75) { r = 255; g = mapValue(val, 50, 75, 120, 200); b = 40; }
+            else { r = 255; g = 255; b = mapValue(val, 75, 100, 100, 240); }
+            
+            simCtx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+            simCtx.shadowColor = `rgba(${r}, ${g}, ${b}, 0.6)`;
+            simCtx.shadowBlur = 25;
+            // 繪製加熱器塊
+            simCtx.beginPath();
+            simCtx.roundRect(beakerX - 30, beakerBottom, beakerWidth + 60, h - beakerBottom, [10, 10, 0, 0]);
+            simCtx.fill();
+            simCtx.shadowBlur = 0;
+
+            // 在加熱器上繪製表面溫度文字 (單行)
+            const heaterCenterX = w / 2;
+            const heaterCenterY = beakerBottom + (h - beakerBottom) / 2;
+            const brightness = r * 0.299 + g * 0.587 + b * 0.114;
+            simCtx.fillStyle = brightness > 160 ? 'rgba(0,0,0,0.80)' : 'rgba(255,255,255,0.95)';
+            simCtx.font = `bold ${Math.max(13, Math.round((h - beakerBottom) * 0.38))}px sans-serif`;
+            simCtx.textAlign = 'center';
+            simCtx.textBaseline = 'middle';
+            simCtx.fillText(`T\u209B = ${100 + Math.round(deltaT)} \u00B0C`, heaterCenterX, heaterCenterY);
+            simCtx.textAlign = 'left';
+            simCtx.textBaseline = 'alphabetic';
+
+            // 2. 繪製燒杯內的水
+            simCtx.fillStyle = 'rgba(14, 165, 233, 0.12)'; // 清透亮藍色
+            simCtx.fillRect(beakerX, beakerY + 50, beakerWidth, beakerBottom - (beakerY + 50));
+            
+            // 繪製水面線
+            simCtx.beginPath();
+            simCtx.moveTo(beakerX, beakerY + 50);
+            simCtx.lineTo(beakerX + beakerWidth, beakerY + 50);
+            simCtx.strokeStyle = 'rgba(14, 165, 233, 0.5)';
+            simCtx.lineWidth = 3;
+            simCtx.stroke();
+
+            // 3. 處理沸騰物理機制 (氣泡與粒子)
+            handleBoilingMechanics(val, beakerX, beakerWidth, beakerBottom);
+
+            // 更新與繪製粒子 (僅在自然對流時明顯)
+            if(currentStage === 1) {
+                particles.forEach(p => { 
+                    p.update(); 
+                    p.draw(simCtx, beakerX, beakerWidth, beakerY, beakerBottom); 
+                });
+            }
+
+            // 更新並繪製所有氣泡
+            bubbles.forEach((bubble, index) => {
+                bubble.update();
+                bubble.draw(simCtx);
+                if (bubble.markedForDeletion) {
+                    bubbles.splice(index, 1);
+                }
+            });
+
+            // 4. 繪製燒杯外框 (深灰藍色以適應明亮背景)
+            simCtx.strokeStyle = 'rgba(100, 116, 139, 0.7)';
+            simCtx.lineWidth = 5;
+            simCtx.lineCap = 'round';
+            simCtx.lineJoin = 'round';
+            simCtx.beginPath();
+            simCtx.moveTo(beakerX, beakerY);
+            simCtx.lineTo(beakerX, beakerBottom);
+            simCtx.lineTo(beakerX + beakerWidth, beakerBottom);
+            simCtx.lineTo(beakerX + beakerWidth, beakerY);
+            simCtx.stroke();
+            
+            // 燒杯上的刻度線
+            simCtx.lineWidth = 2;
+            for(let i=1; i<=4; i++) {
+                let y = beakerBottom - i * (beakerBottom - beakerY - 50)/5;
+                simCtx.beginPath();
+                simCtx.moveTo(beakerX, y);
+                simCtx.lineTo(beakerX + 20, y);
+                simCtx.stroke();
+            }
+
+            animationId = requestAnimationFrame(animate);
+        }
+
+        function handleBoilingMechanics(val, x, width, bottom) {
+            vaporFilmWobble += 0.15;
+            
+            if (currentStage === 1) {
+                // 階段 1: 自然對流，讓殘留的氣泡浮出水面消失
+                bubbles = bubbles.filter(b => b.y < bottom - 10 || b.isVaporPatch); 
+            } 
+            else if (currentStage === 2) {
+                // 階段 2: 核沸騰 - 大量氣泡產生
+                const spawnRate = mapValue(val, 25, 50, 0.3, 1.2);
+                if (Math.random() < spawnRate) {
+                    let bubbleCount = val > 40 ? 4 : (val > 30 ? 2 : 1);
+                    for(let i=0; i< bubbleCount; i++) {
+                        let bx = x + 10 + Math.random() * (width - 20);
+                        let br = Math.random() * 4 + 2;
+                        let by = bottom - br - 2;
+                        let bvy = Math.random() * 2 + 1.5 + (val-25)*0.15;
+                        bubbles.push(new Bubble(bx, by, br, bvy, (Math.random()-0.5)*0.8));
+                    }
+                }
+            } 
+            else if (currentStage === 3) {
+                // 階段 3: 過渡區沸騰
+                // 物理機制：底部局部蒸氣膜不斷形成又崩塌（扁平氣泡快速消散），
+                // 部分蒸氣塊脫離後因表面張力逐漸從扁橢圓恢復為圓形上浮。
+
+                // (A) 底部扁平蒸氣膜塊：快速生成、快速消散，幾乎不上升
+                if (Math.random() < 0.45) {
+                    let bx = x + 15 + Math.random() * (width - 30);
+                    let br = Math.random() * 14 + 7;
+                    let by = bottom - br * 0.4; // 緊貼加熱面
+                    // isVaporPatch=true → 快速消散；speedY 極小，幾乎不動
+                    bubbles.push(new Bubble(bx, by, br, 0.15, (Math.random()-0.5)*0.2, true));
+                }
+
+                // (B) 脫離底部的扁平氣泡：從 flatness=1 (扁平) 上升過程中漸變為圓形
+                if (Math.random() < 0.13) {
+                    let bx = x + 20 + Math.random() * (width - 40);
+                    let br = Math.random() * 12 + 7;
+                    let by = bottom - br;
+                    // flatness=1.0 → 開始極扁，隨上升變圓
+                    bubbles.push(new Bubble(bx, by, br, Math.random() * 2.2 + 1.2, (Math.random()-0.5)*0.9, false, 1.0));
+                }
+
+                // (C) 繪製底部局部不穩定蒸氣膜背景（連續但破碎的紋理）
+                simCtx.fillStyle = `rgba(224, 242, 254, ${0.38 + Math.sin(vaporFilmWobble) * 0.15})`;
+                for(let i = 0; i < 8; i++) {
+                    if(Math.random() > 0.28) {
+                        simCtx.beginPath();
+                        let patchX = x + (i + 0.5) * (width / 8);
+                        let patchW = (width / 9) * (0.6 + Math.random() * 0.7);
+                        let patchH = 5 + Math.sin(vaporFilmWobble + i * 1.3) * 3.5 + Math.random() * 6;
+                        simCtx.ellipse(patchX, bottom - patchH * 0.5, patchW, patchH, 0, 0, Math.PI * 2);
+                        simCtx.fill();
+                    }
+                }
+            } 
+            else if (currentStage === 4) {
+                // 階段 4: 膜沸騰 - 連續的蒸氣膜與脫離的巨大氣泡
+                vaporFilmHeight = 18 + Math.sin(vaporFilmWobble) * 4;
+                
+                // 繪製連續穩定的蒸氣膜 (萊頓弗羅斯特層)
+                simCtx.fillStyle = 'rgba(216, 180, 254, 0.75)'; // 淺紫蒸氣膜
+                simCtx.strokeStyle = 'rgba(147, 51, 234, 0.9)';
+                simCtx.lineWidth = 2;
+                simCtx.beginPath();
+                simCtx.moveTo(x, bottom);
+                for(let ix = 0; ix <= width; ix += 10) {
+                    simCtx.lineTo(x + ix, bottom - vaporFilmHeight + Math.cos(vaporFilmWobble + ix*0.06)*6);
+                }
+                simCtx.lineTo(x + width, bottom);
+                simCtx.fill();
+                simCtx.stroke(); // 畫出膜的頂部邊界
+
+                // 偶爾脫離大氣泡
+                if (Math.random() < 0.1) {
+                    let bx = x + 30 + Math.random() * (width - 60);
+                    let br = Math.random() * 25 + 15; // 超大氣泡
+                    let by = bottom - vaporFilmHeight - br + 5;
+                    bubbles.push(new Bubble(bx, by, br, Math.random() * 2 + 1.5, (Math.random()-0.5)*1));
+                }
+            }
+        }
+
+        // --- 初始化啟動 ---
+        updateState();
+        animate();
+
+    </script>
+</body>
+</html>
