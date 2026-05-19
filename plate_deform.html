@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>鋼板拉應力計算器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+            margin-top: -6px;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #d1d5db;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body class="text-gray-800 antialiased min-h-screen p-4 md:p-8">
+
+    <div class="max-w-5xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
+        
+        <header class="bg-blue-600 text-white p-6 md:p-8">
+            <h1 class="text-2xl md:text-3xl font-bold flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+                堆高機舉升鋼板 - 應力分析
+            </h1>
+            <p class="mt-2 text-blue-100 text-sm md:text-base">即時計算懸垂狀態下的最大拉應力與 3D 變形模擬。</p>
+        </header>
+
+        <div class="p-6 md:p-8 border-b border-gray-200">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold text-gray-700">3D 應力與變形模擬</h2>
+                <div class="text-sm text-gray-500 hidden md:block">滑鼠左鍵旋轉，滾輪縮放 (誇飾變形比例以利觀察)</div>
+            </div>
+            
+            <div id="canvas-container" class="w-full h-64 md:h-96 bg-gray-900 rounded-xl overflow-hidden relative cursor-move shadow-inner">
+                <div class="absolute bottom-4 right-4 bg-white/90 p-2 rounded text-xs shadow pointer-events-none z-10">
+                    <div class="font-semibold mb-1 text-gray-700">上表面拉應力</div>
+                    <div class="w-32 h-3 bg-gradient-to-r from-blue-500 via-green-500 to-red-500 rounded-sm"></div>
+                    <div class="flex justify-between mt-1 text-gray-600">
+                        <span>低 (0)</span>
+                        <span>高 (Max)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 p-6 md:p-8">
+            <div class="space-y-6">
+                <h2 class="text-xl font-semibold text-gray-700 border-b pb-2">參數設定</h2>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">鋼板長度 ($L$) - mm</label>
+                    <div class="flex items-center gap-4">
+                        <input type="range" id="length-slider" min="2000" max="20000" step="100" value="12912" class="flex-grow">
+                        <input type="number" id="length-input" value="12912" class="w-24 px-2 py-1 border rounded text-right focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">鋼板寬度 ($b$) - mm</label>
+                    <div class="flex items-center gap-4">
+                        <input type="range" id="width-slider" min="1000" max="4000" step="10" value="2438" class="flex-grow">
+                        <input type="number" id="width-input" value="2438" class="w-24 px-2 py-1 border rounded text-right focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">鋼板厚度 ($h$) - mm</label>
+                    <div class="flex items-center gap-4">
+                        <input type="range" id="thickness-slider" min="5" max="50" step="1" value="19" class="flex-grow">
+                        <input type="number" id="thickness-input" value="19" class="w-24 px-2 py-1 border rounded text-right focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">牙叉間距 ($d$) - mm</label>
+                    <div class="flex items-center gap-4">
+                        <input type="range" id="fork-slider" min="500" max="3000" step="10" value="1400" class="flex-grow">
+                        <input type="number" id="fork-input" value="1400" class="w-24 px-2 py-1 border rounded text-right focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">材料降伏強度 - MPa (參考用)</label>
+                    <select id="material-select" class="w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        <option value="250">一般碳鋼 SS400 / A36 (250 MPa)</option>
+                        <option value="345">高張力鋼板 SM490 (345 MPa)</option>
+                        <option value="690">高強度合金鋼 (690 MPa)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 flex flex-col justify-between">
+                <div>
+                    <h2 class="text-xl font-semibold text-gray-700 border-b pb-2 mb-4">計算結果</h2>
+                    
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">懸伸長度 ($L_o$)</span>
+                            <span id="out-lo" class="font-mono font-medium text-gray-900">5.756 m</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">總重量</span>
+                            <span id="out-weight" class="font-mono font-medium text-gray-900">4694.5 kg</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">支點最大彎矩 ($M_{max}$)</span>
+                            <span id="out-moment" class="font-mono font-medium text-gray-900">59092.7 N·m</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 p-4 bg-white rounded-lg shadow-inner border border-gray-100 text-center">
+                        <span class="block text-sm text-gray-500 mb-1">牙叉支撐點上表面最大拉應力</span>
+                        <div class="flex items-end justify-center gap-2">
+                            <span id="out-stress" class="text-4xl md:text-5xl font-bold text-gray-900">403</span>
+                            <span class="text-xl text-gray-600 font-medium mb-1">MPa</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="safety-alert" class="mt-6 p-4 rounded-lg flex items-start gap-3 transition-colors duration-300">
+                    <div id="safety-icon"></div>
+                    <div>
+                        <h3 id="safety-title" class="font-bold text-lg">評估中...</h3>
+                        <p id="safety-message" class="text-sm mt-1">請稍候。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-gray-100 p-4 text-center text-sm text-gray-500 border-t">
+            * 假設條件：鋼板材質均勻，堆高機精準從中央舉起，未考慮動態載荷。<br>
+            密度 $\rho$ = 7850 kg/m³, 重力加速度 $g$ = 9.81 m/s²
+        </div>
+    </div>
+
+    <script>
+        const DENSITY = 7850; 
+        const GRAVITY = 9.81; 
+        const SEGMENTS = 60; 
+
+        let scene, camera, renderer, plateMesh, forksGroup;
+
+        const inputs = {
+            length: { slider: document.getElementById('length-slider'), number: document.getElementById('length-input') },
+            width: { slider: document.getElementById('width-slider'), number: document.getElementById('width-input') },
+            thickness: { slider: document.getElementById('thickness-slider'), number: document.getElementById('thickness-input') },
+            fork: { slider: document.getElementById('fork-slider'), number: document.getElementById('fork-input') }
+        };
+        const materialSelect = document.getElementById('material-select');
+
+        const outputs = {
+            lo: document.getElementById('out-lo'),
+            weight: document.getElementById('out-weight'),
+            moment: document.getElementById('out-moment'),
+            stress: document.getElementById('out-stress')
+        };
+
+        const safety = {
+            container: document.getElementById('safety-alert'),
+            icon: document.getElementById('safety-icon'),
+            title: document.getElementById('safety-title'),
+            message: document.getElementById('safety-message')
+        };
+
+        function calculate() {
+            const L = parseFloat(inputs.length.number.value) / 1000;
+            const b = parseFloat(inputs.width.number.value) / 1000;
+            const h = parseFloat(inputs.thickness.number.value) / 1000;
+            const d = parseFloat(inputs.fork.number.value) / 1000;
+            const yieldStrength = parseFloat(materialSelect.value);
+
+            const Lo = (L - d) / 2;
+            
+            if (Lo < 0) {
+                outputs.lo.textContent = "無效設定";
+                outputs.weight.textContent = "-";
+                outputs.moment.textContent = "-";
+                outputs.stress.textContent = "-";
+                updateSafetyUI("error");
+                if(scene) update3DModel(L, b, d, 0, 0, 1);
+                return;
+            }
+
+            const volume = L * b * h;
+            const totalWeightKg = volume * DENSITY;
+            
+            const area = b * h;
+            const massPerMeter = DENSITY * area;
+            const q = massPerMeter * GRAVITY;
+
+            const M_max = (q * Math.pow(Lo, 2)) / 2;
+            const y = h / 2;
+            const I = (b * Math.pow(h, 3)) / 12;
+            
+            const stressPa = (M_max * y) / I;
+            const stressMPa = stressPa / 1000000;
+
+            outputs.lo.textContent = Lo.toFixed(3) + ' m';
+            outputs.weight.textContent = totalWeightKg.toFixed(1) + ' kg';
+            outputs.moment.textContent = M_max.toFixed(1) + ' N·m';
+            
+            if(stressMPa > 9999) {
+                outputs.stress.textContent = "> 10000";
+            } else {
+                outputs.stress.textContent = stressMPa.toFixed(0);
+            }
+
+            let status = "safe";
+            if (stressMPa > yieldStrength) {
+                status = "danger";
+            } else if (stressMPa > yieldStrength * 0.6) {
+                status = "warning";
+            }
+
+            updateSafetyUI(status, stressMPa, yieldStrength);
+            
+            // 更新 3D 模型
+            if (scene) {
+                update3DModel(L, b, d, M_max, q, I);
+            }
+        }
+
+        function updateSafetyUI(status, stress, yieldStr) {
+            safety.container.className = "mt-6 p-4 rounded-lg flex items-start gap-3 transition-colors duration-300 ";
+            
+            if (status === "danger") {
+                safety.container.classList.add("bg-red-100", "text-red-800", "border", "border-red-200");
+                safety.icon.innerHTML = `<svg class="w-6 h-6 text-red-600 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>`;
+                safety.title.textContent = "極度危險！發生塑性變形";
+                safety.message.innerHTML = `計算應力 (<b>${stress.toFixed(0)} MPa</b>) 已超過材料降伏強度 (${yieldStr} MPa)。<br><b>鋼板將會發生永久彎曲折損！</b> 請立即更改吊掛方式。`;
+            } else if (status === "warning") {
+                safety.container.classList.add("bg-yellow-50", "text-yellow-800", "border", "border-yellow-200");
+                safety.icon.innerHTML = `<svg class="w-6 h-6 text-yellow-600 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>`;
+                safety.title.textContent = "警告：安全係數過低";
+                safety.message.innerHTML = `計算應力 (<b>${stress.toFixed(0)} MPa</b>) 接近降伏強度。考慮到震動等動態因素，存在風險。`;
+            } else if (status === "safe") {
+                safety.container.classList.add("bg-green-50", "text-green-800", "border", "border-green-200");
+                safety.icon.innerHTML = `<svg class="w-6 h-6 text-green-600 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+                safety.title.textContent = "靜態應力在安全範圍內";
+                safety.message.innerHTML = `目前設定下，應力低於降伏強度。但仍需注意操作平穩，避免劇烈晃動。`;
+            } else {
+                safety.container.classList.add("bg-gray-100", "text-gray-800");
+                safety.icon.innerHTML = ``;
+                safety.title.textContent = "設定無效";
+                safety.message.innerHTML = `牙叉間距不可大於鋼板總長度。`;
+            }
+        }
+
+        function setupEventListeners(key) {
+            const { slider, number } = inputs[key];
+            slider.addEventListener('input', (e) => {
+                number.value = e.target.value;
+                calculate();
+            });
+            number.addEventListener('input', (e) => {
+                let val = parseFloat(e.target.value);
+                const min = parseFloat(slider.min);
+                const max = parseFloat(slider.max);
+                if (val < min) val = min;
+                if (val > max) val = max;
+                if(!isNaN(val)) {
+                    slider.value = val;
+                    calculate();
+                }
+            });
+            number.addEventListener('blur', (e) => {
+                 let val = parseFloat(e.target.value);
+                 if (isNaN(val)) {
+                     number.value = slider.value;
+                 } else {
+                     slider.value = val;
+                     number.value = val;
+                 }
+                 calculate();
+            });
+        }
+        Object.keys(inputs).forEach(setupEventListeners);
+        materialSelect.addEventListener('change', calculate);
+
+        function init3D() {
+            const container = document.getElementById('canvas-container');
+            
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x1a202c);
+            
+            const aspect = container.clientWidth / container.clientHeight;
+            camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 1000);
+            camera.position.set(0, 15, 20);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            container.appendChild(renderer.domElement);
+
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+            
+            const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            dirLight.position.set(10, 20, 10);
+            scene.add(dirLight);
+
+            const geometry = new THREE.PlaneGeometry(1, 1, SEGMENTS, 1);
+            const material = new THREE.MeshLambertMaterial({ 
+                color: 0xffffff, 
+                side: THREE.DoubleSide,
+                vertexColors: true,
+                wireframe: false
+            });
+            
+            plateMesh = new THREE.Mesh(geometry, material);
+            plateMesh.rotation.x = -Math.PI / 2;
+            scene.add(plateMesh);
+
+            forksGroup = new THREE.Group();
+            scene.add(forksGroup);
+
+            const gridHelper = new THREE.GridHelper(40, 40, 0x4a5568, 0x2d3748);
+            gridHelper.position.y = -2;
+            scene.add(gridHelper);
+
+            let isDragging = false;
+            let previousMousePosition = { x: 0, y: 0 };
+            
+            container.addEventListener('mousedown', () => { isDragging = true; });
+            container.addEventListener('mousemove', (e) => {
+                if (isDragging) {
+                    const deltaMove = { x: e.offsetX - previousMousePosition.x, y: e.offsetY - previousMousePosition.y };
+                    const rotationSpeed = 0.005;
+                    camera.position.applyAxisAngle(new THREE.Vector3(0, 1, 0), -deltaMove.x * rotationSpeed);
+                    
+                    camera.position.y += deltaMove.y * 0.1;
+                    if(camera.position.y < 1) camera.position.y = 1;
+                    if(camera.position.y > 30) camera.position.y = 30;
+                    
+                    camera.lookAt(scene.position);
+                }
+                previousMousePosition = { x: e.offsetX, y: e.offsetY };
+            });
+            container.addEventListener('mouseup', () => { isDragging = false; });
+            container.addEventListener('mouseleave', () => { isDragging = false; });
+            container.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                camera.position.z += e.deltaY * 0.05;
+                if(camera.position.z < 5) camera.position.z = 5;
+                if(camera.position.z > 50) camera.position.z = 50;
+                camera.lookAt(scene.position);
+            });
+            window.addEventListener('resize', () => {
+                const width = container.clientWidth;
+                const height = container.clientHeight;
+                renderer.setSize(width, height);
+                camera.aspect = width / height;
+                camera.updateProjectionMatrix();
+            });
+
+            camera.lookAt(scene.position);
+            animate();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        }
+
+        function calculateDeflectionAndStress(x, L, d, q, E, I) {
+            const forkPos = d / 2;
+            const halfL = L / 2;
+            const absX = Math.abs(x);
+            let moment = 0;
+            let deflection = 0;
+
+            if (absX >= forkPos) {
+                const distanceToEnd = halfL - absX;
+                moment = (q * Math.pow(distanceToEnd, 2)) / 2; 
+            } else {
+                const Mo = (q * Math.pow(halfL - forkPos, 2)) / 2; 
+                moment = Mo - (q * Math.pow(forkPos, 2) / 2) + (q * Math.pow(absX, 2) / 2);
+            }
+
+            if (absX >= forkPos) {
+                const lx = absX - forkPos;
+                const lo = halfL - forkPos;
+                deflection = - Math.pow(lx / lo, 2) * 1.5; // 誇張比例
+            } else {
+                deflection = (1 - Math.pow(absX / forkPos, 2)) * 0.3; // 誇張比例
+            }
+            return { moment: Math.abs(moment), deflection: deflection };
+        }
+
+        function getColorForStress(moment, maxMoment) {
+            let ratio = maxMoment > 0 ? moment / maxMoment : 0;
+            ratio = Math.max(0, Math.min(1, ratio));
+            const hue = (1 - ratio) * 240; // 藍到紅
+            return new THREE.Color(`hsl(${hue}, 100%, 50%)`);
+        }
+
+        function update3DModel(L, b, d, M_max, q, I) {
+            if(!scene) return;
+
+            const scale = 1; 
+            const visualL = L * scale;
+            const visualB = b * scale;
+            const visualD = d * scale;
+
+            plateMesh.geometry.dispose();
+            plateMesh.geometry = new THREE.PlaneGeometry(visualL, visualB, SEGMENTS, 1);
+            
+            const positions = plateMesh.geometry.attributes.position;
+            const colors = [];
+            const E = 200e9; 
+
+            for (let i = 0; i < positions.count; i++) {
+                const vx = positions.getX(i);
+                const realX = vx / scale;
+                const result = calculateDeflectionAndStress(realX, L, d, q, E, I);
+                
+                positions.setZ(i, result.deflection);
+                const color = getColorForStress(result.moment, M_max);
+                colors.push(color.r, color.g, color.b);
+            }
+
+            plateMesh.geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+            plateMesh.geometry.attributes.position.needsUpdate = true;
+            plateMesh.geometry.computeVertexNormals();
+
+            forksGroup.clear();
+            if(d < L) {
+                const forkGeometry = new THREE.BoxGeometry(0.2, 0.5, visualB + 0.5);
+                const forkMaterial = new THREE.MeshLambertMaterial({ color: 0xe2e8f0 }); 
+                
+                const leftFork = new THREE.Mesh(forkGeometry, forkMaterial);
+                leftFork.position.set(-visualD/2, -0.25, 0); 
+                
+                const rightFork = new THREE.Mesh(forkGeometry, forkMaterial);
+                rightFork.position.set(visualD/2, -0.25, 0);
+                
+                forksGroup.add(leftFork);
+                forksGroup.add(rightFork);
+            }
+
+            const distance = Math.max(visualL, visualB) * 1.2;
+            camera.position.set(0, distance * 0.8, distance);
+            camera.lookAt(scene.position);
+        }
+
+        window.onload = function() {
+            init3D();
+            calculate();
+        };
+
+    </script>
+</body>
+</html>
