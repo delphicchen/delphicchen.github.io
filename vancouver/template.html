@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>溫哥華景點整理</title>
+<!-- 這個檔案由 build.py 產生。要改內容請改 guide.json，不要直接改 index.html。 -->
+<style>/*LEAFLET_CSS*/</style>
+<style>
+:root{
+  --bg:#f2f5f6; --surface:#ffffff; --fg:#0b161d; --muted:#36444c; --line:#c3ced3;
+  --accent:#0d6b5e; --accent-ink:#ffffff; --pin:#d14a12; --pin-ink:#ffffff;
+  --warn-bg:#fff1dc; --warn-fg:#5c3000;
+  --font:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC","Microsoft JhengHei","Segoe UI",sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0f171b; --surface:#172228; --fg:#f2f7f9; --muted:#c3d0d6; --line:#3a4c55;
+  --accent:#3fb39f; --accent-ink:#06201b; --pin:#ff7a3d; --pin-ink:#1a0a02;
+  --warn-bg:#3a2a12; --warn-fg:#ffe2b8;
+  color-scheme:dark;
+}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font:17px/1.6 var(--font);-webkit-text-size-adjust:100%}
+.wrap{max-width:760px;margin:0 auto;padding-inline:16px;padding-block:0 32px}
+header{padding-top:calc(14px + env(safe-area-inset-top,0px));padding-bottom:6px}
+.eyebrow{font-size:14px;letter-spacing:.06em;color:var(--muted);margin:0}
+h1{font-size:26px;margin:2px 0 0;text-wrap:balance}
+.lede{margin:4px 0 0;color:var(--muted);font-size:16px}
+.tabs{position:sticky;top:0;z-index:1000;background:var(--bg);padding-block:8px;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-inline:-16px;padding-inline:16px}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:0 0 auto;border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:10px;padding:6px 12px;text-align:left;font:inherit;cursor:pointer}
+.tab b{display:block;font-size:18px;line-height:1.25;white-space:nowrap}
+.tab small{color:var(--muted);font-size:13px;white-space:nowrap}
+.tab[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.tab[aria-selected="true"] small{color:var(--accent-ink);opacity:.9}
+.tab:focus-visible,.btn:focus-visible,.navs a:focus-visible,.area:focus-visible{outline:3px solid var(--pin);outline-offset:2px}
+.head{margin:10px 0 6px}
+.head h2{font-size:22px;margin:0}
+.note{background:var(--warn-bg);color:var(--warn-fg);border-radius:10px;padding:10px 14px;font-size:16px;margin:0 0 10px}
+.mapbox{border-radius:14px;overflow:hidden;border:1px solid var(--line);background:#e9eef0}
+#map{height:min(55vh,480px);min-height:320px;width:100%;background:#e9eef0}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:14px;color:var(--muted);margin:8px 2px 0}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{display:inline-block;width:18px;height:4px;border-radius:2px}
+.maptools{display:flex;justify-content:flex-end;margin:10px 0}
+.btn{border:1px solid var(--line);background:var(--surface);color:var(--fg);font:inherit;font-size:16px;font-weight:600;min-height:44px;padding:6px 14px;border-radius:10px;cursor:pointer}
+.status{font-size:15px;color:var(--muted);margin:0 0 8px;min-height:1em}
+ol.list{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;box-shadow:0 1px 2px rgba(0,0,0,.05);scroll-margin-top:90px}
+.card.hl{border-color:var(--pin);box-shadow:0 0 0 2px var(--pin)}
+.ttl{font-weight:700;font-size:18px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.en{display:block;font-size:14px;color:var(--muted);font-weight:500;margin-top:1px}
+.card p{margin:6px 0 0;color:var(--muted);font-size:16px}
+.num{display:inline-grid;place-items:center;min-width:26px;height:26px;border-radius:13px;background:var(--pin);color:var(--pin-ink);font-size:14px;font-weight:700;flex:0 0 auto}
+.tag{font-size:13px;font-weight:700;border-radius:4px;padding:1px 7px;border:1px solid var(--line);color:var(--muted)}
+.tag.free{border-color:var(--accent);color:var(--accent)}
+.navs{display:flex;gap:6px;margin-top:10px}
+.navs a{flex:1 1 0;min-height:44px;display:inline-flex;align-items:center;justify-content:center;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);color:var(--fg);font-size:15px;font-weight:700;text-decoration:none;padding:4px 6px;white-space:nowrap}
+.navs a.rec{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.fee{display:flex;gap:8px;align-items:baseline;margin:8px 0 0;font-size:16px;font-weight:600;color:var(--fg)}
+.fee b{flex:0 0 auto;font-size:13px;letter-spacing:.04em;border-radius:4px;padding:1px 7px;background:var(--warn-bg);color:var(--warn-fg)}
+.buy{margin:8px 0 0}
+.buy a{min-height:44px;display:inline-flex;align-items:center;padding:4px 14px;border:1.5px solid var(--accent);border-radius:10px;color:var(--accent);font-weight:700;text-decoration:none}
+.area{display:block;width:100%;text-align:left;font:inherit;color:inherit;cursor:pointer}
+.area .cnt{color:var(--muted);font-size:14px;font-weight:600}
+section.tips{margin-top:24px}
+section.tips h2{font-size:20px;margin:0 0 6px}
+section.tips ul{margin:0;padding-left:22px}
+section.tips li{margin:6px 0}
+.foot{font-size:14px;color:var(--muted);margin-top:16px}
+.pin{background:#d14a12;color:#fff;border:2px solid #fff;border-radius:50%;display:grid!important;place-items:center;font:700 15px/1 var(--font);box-shadow:0 1px 4px rgba(0,0,0,.45)}
+.pin.dot{font-size:0}
+.me{background:#1a73e8;border:3px solid #fff;border-radius:50%;box-shadow:0 0 0 3px rgba(26,115,232,.3)}
+.leaflet-tooltip.lbl{background:#fff;color:#0b161d;border:1px solid #9fb0b8;border-radius:6px;font:700 14px/1.3 var(--font);padding:2px 7px;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.leaflet-tooltip.lbl:before,.leaflet-tooltip.stn:before{display:none}
+.leaflet-tooltip.stn{background:rgba(255,255,255,.9);border:0;border-radius:4px;box-shadow:none;color:#0b161d;font:600 13px/1.25 var(--font);padding:0 4px}
+.leaflet-container{font-family:var(--font)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">大溫哥華 · 2026 年 10 月整理</p>
+    <h1>溫哥華景點整理</h1>
+    <p class="lede">依區域分頁，每頁的景點可排成半天到一天。卡片下方按鈕直接開 Google 地圖或 Uber 導航。</p>
+  </header>
+  <nav class="tabs" id="tabs" role="tablist" aria-label="區域"></nav>
+  <div class="head"><h2 id="title"></h2></div>
+  <p class="note" id="note"></p>
+  <div class="mapbox"><div id="map" aria-label="景點地圖"></div></div>
+  <div class="legend" id="legend"></div>
+  <div class="maptools"><button class="btn" id="locBtn" type="button">顯示我的位置</button></div>
+  <p class="status" id="status">點地圖上的編號會跳到對應卡片。實心導航按鈕是建議的交通方式。</p>
+  <ol class="list" id="list"></ol>
+  <section class="tips">
+    <h2>交通與實用資訊</h2>
+    <ul>
+      <li><b>SkyTrain 票價</b>：大人用信用卡或手機感應進出站即可；也可在站內售票機買 Compass 卡（押金 $6，可退）或 DayPass（大人 $12.55，當天無限搭，含公車和 SeaBus）。大人單程約 1 區 $3.50、2 區 $5.10（Richmond 到市區算 2 區；平日 18:30 後和週末一律 1 區）。12 歲以下免費。</li>
+      <li><b>機場附加費</b>：從 YVR–Airport、Sea Island Centre、Templeton 三站往市區方向搭車，大人另加 $6.50。</li>
+      <li><b>Canada Line 分岔</b>：從 Waterfront 往南，往 Richmond–Brighouse 的車才停 Aberdeen、Lansdowne；往 YVR 的車在 Bridgeport 後轉往機場。搭錯就在 Bridgeport 換車。</li>
+      <li><b>治安</b>：避開 East Hastings St（約 Carrall St 到 Main St 一段）；Gastown 和唐人街天黑後少逗留。</li>
+      <li><b>天氣</b>：10 月下旬約 6–13°C，常下雨。帶雨衣、穿防水鞋，標「室內」的景點適合雨天。</li>
+      <li><b>票價</b>：標示為加幣，是 2026 年網路查得的參考價，多數另加 5% GST；兒童年齡分級各館不同，營業時間和季節活動以官網為準。標「網購」的建議出發前先買票。</li>
+      <li>緊急電話 911。</li>
+    </ul>
+  </section>
+  <p class="foot">底圖：OpenStreetMap。地圖程式庫：Leaflet。車站座標取自 Wikipedia，路線以直線連接各站，僅示意。導航以 Google 地圖／Uber 結果為準。</p>
+</div>
+<script>/*LEAFLET_JS*/</script>
+<script>
+const DATA = /*DATA*/;
+const APP_ID = "VancouverSightsGuide/1.0";
+const TILE_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
+const MODE_LABEL = {canada:"Canada Line",expo:"Expo Line",millennium:"Millennium Line",uber:"Uber",ferry:"渡輪",walk:"步行"};
+const REC = {walk:"walking",uber:"uber",canada:"transit",expo:"transit",millennium:"transit",ferry:"transit"};
+const TAG = {"免費":"free"};
+let cur = null, map = null, layer = null, pins = [], stationMarkers = [], meMarker = null, meCircle = null, firstFix = true, tileFails = 0, tileOks = 0;
+function store(k,v){try{ if(v===undefined) return localStorage.getItem(k); localStorage.setItem(k,v);}catch(e){return null}}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function gmapUrl(p,m){ return "https://www.google.com/maps/dir/?api=1&destination=" + encodeURIComponent(p.q) + "&travelmode=" + m; }
+function uberUrl(p){
+  return "https://m.uber.com/ul/?action=setPickup&pickup=my_location&dropoff[latitude]=" + p.lat + "&dropoff[longitude]=" + p.lon
+    + "&dropoff[nickname]=" + encodeURIComponent(p.n || p.zh) + "&dropoff[formatted_address]=" + encodeURIComponent(p.q);
+}
+function navLinks(p,m){
+  const rec = REC[m] || "";
+  return `<span class="navs">` + [["transit","大眾運輸",gmapUrl(p,"transit")],["walking","步行",gmapUrl(p,"walking")],["uber","Uber",uberUrl(p)]]
+    .map(([k,v,u])=>`<a class="${k===rec?"rec":""}" href="${esc(u)}" target="_blank" rel="noopener" aria-label="${esc(p.zh)}：${v}">${v}</a>`).join("") + `</span>`;
+}
+function setStatus(t){ document.getElementById("status").textContent = t; }
+const HeaderTiles = L.TileLayer.extend({
+  createTile(coords, done){
+    const img = document.createElement("img");
+    img.alt = ""; img.setAttribute("role","presentation");
+    const ctrl = ("AbortController" in window) ? new AbortController() : null;
+    img._ctrl = ctrl;
+    fetch(this.getTileUrl(coords), {headers:{"X-Requested-With":APP_ID}, signal: ctrl ? ctrl.signal : undefined, mode:"cors"})
+      .then(r=>{ if(!r.ok) throw new Error("HTTP " + r.status); return r.blob(); })
+      .then(b=>{
+        const u = URL.createObjectURL(b);
+        img.onload = ()=>{ URL.revokeObjectURL(u); tileOks++; done(null,img); };
+        img.onerror = e=>{ URL.revokeObjectURL(u); done(e,img); };
+        img.src = u;
+      })
+      .catch(e=>{ if(e && e.name === "AbortError") return; tileFails++; if(tileFails >= 4 && tileOks === 0) setStatus("道路底圖載入失敗（請檢查網路）。捷運線、景點和導航仍可使用。"); done(e,img); });
+    return img;
+  },
+  _abortLoading(){
+    for(const k in this._tiles){ const t = this._tiles[k]; if(t.coords.z !== this._tileZoom && t.el._ctrl) t.el._ctrl.abort(); }
+    L.TileLayer.prototype._abortLoading.call(this);
+  }
+});
+function initMap(){
+  map = L.map("map",{zoomControl:true, attributionControl:true});
+  new HeaderTiles(TILE_URL,{maxZoom:19, attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(map);
+  const colorOf = {};
+  DATA.lines.forEach(l=>l.stops.forEach(s=>{ (colorOf[s] = colorOf[s] || []).push(l.color); }));
+  DATA.lines.forEach(l=>{
+    const pts = l.stops.map(s=>[DATA.stations[s].lat, DATA.stations[s].lon]);
+    L.polyline(pts,{color:"#ffffff",weight:8,opacity:.9,interactive:false}).addTo(map);
+    L.polyline(pts,{color:l.color,weight:5,opacity:.95}).addTo(map).bindTooltip(l.n,{sticky:true});
+  });
+  Object.entries(DATA.stations).forEach(([id,s])=>{
+    const transfer = new Set(colorOf[id]).size > 1;
+    const m = L.circleMarker([s.lat,s.lon],{radius:transfer?7:5,color:colorOf[id][0],weight:transfer?4:3,fillColor:"#fff",fillOpacity:1}).addTo(map);
+    stationMarkers.push({m, s});
+  });
+  map.on("zoomend", ()=>{ updateStationLabels(); placeLabels(); });
+  map.on("moveend", placeLabels);
+}
+function updateStationLabels(){
+  const all = map.getZoom() >= 14;
+  stationMarkers.forEach(({m,s})=>{
+    const perm = !!s.key || all, t = m.getTooltip();
+    if(t && t.options.permanent === perm) return;
+    m.unbindTooltip();
+    m.bindTooltip(s.n + " 站",{permanent:perm,direction:"right",offset:[7,0],className:"stn"});
+  });
+}
+function renderLegend(){
+  const seen = new Map(); DATA.lines.forEach(l=>{ const base=l.n.split("（")[0]; if(!seen.has(base)) seen.set(base,l.color); });
+  document.getElementById("legend").innerHTML = [...seen].map(([n,c])=>`<span><i style="background:${c}"></i>${esc(n)}</span>`).join("")
+    + `<span><i style="background:#d14a12;height:10px;width:10px;border-radius:50%"></i>景點</span>`;
+}
+const TABS = [{key:"all",name:"總覽",sub:DATA.areas.length + " 區"}].concat(DATA.areas);
+function renderTabs(){
+  const nav = document.getElementById("tabs");
+  nav.innerHTML = TABS.map(a=>`<button class="tab" role="tab" id="t-${a.key}" aria-selected="false" data-k="${a.key}"><b>${esc(a.name)}</b><small>${esc(a.sub)}</small></button>`).join("");
+  nav.addEventListener("click",e=>{const b=e.target.closest(".tab"); if(b) select(b.dataset.k,true);});
+}
+function spotCard(s,i){
+  const p = DATA.places[s.p];
+  const tags = (s.tags||[]).map(t=>`<span class="tag ${TAG[t]||""}">${esc(t)}</span>`).join("");
+  const chip = s.m && MODE_LABEL[s.m] ? `<span class="tag">${MODE_LABEL[s.m]}</span>` : "";
+  const fee = p.fee ? `<p class="fee"><b>票價</b><span>${esc(p.fee)}</span></p>` : "";
+  const buy = p.buy ? `<p class="buy"><a href="${esc(p.buy)}" target="_blank" rel="noopener">官網購票 ↗</a></p>` : "";
+  return `<li><div class="card" data-p="${s.p}">
+    <span class="ttl"><span class="num">${i+1}</span><span>${esc(p.zh)}${p.n && p.n !== p.zh ? `<span class="en">${esc(p.n)}</span>` : ""}</span></span>
+    <p style="display:flex;gap:6px;flex-wrap:wrap">${chip}${tags}</p>
+    <p>${esc(s.d)}</p>${fee}${buy}${navLinks(p,s.m)}</div></li>`;
+}
+function renderList(){
+  const el = document.getElementById("list");
+  if(cur.key === "all"){
+    el.innerHTML = DATA.areas.map(a=>`<li><button class="card area" data-k="${a.key}">
+      <span class="ttl">${esc(a.name)}<span class="cnt">${a.spots.length} 個景點</span></span>
+      <p>${esc(a.spots.map(s=>DATA.places[s.p].zh).join("、"))}</p></button></li>`).join("");
+    el.querySelectorAll(".area").forEach(b=>b.addEventListener("click",()=>{ select(b.dataset.k,true); window.scrollTo({top:0}); }));
+  } else el.innerHTML = cur.spots.map(spotCard).join("");
+}
+function drawPins(){
+  if(!map) return;
+  if(layer) map.removeLayer(layer);
+  layer = L.layerGroup().addTo(map); pins = [];
+  const pts = [], all = cur.key === "all";
+  const list = all ? DATA.areas.flatMap(a=>a.spots.map(s=>({s,a}))) : cur.spots.map(s=>({s,a:cur}));
+  list.forEach(({s,a},i)=>{
+    const p = DATA.places[s.p], w = all ? 16 : 32;
+    const icon = L.divIcon({className:"pin" + (all ? " dot" : ""),html:all ? "" : String(i+1),iconSize:[w,w],iconAnchor:[w/2,w/2]});
+    const m = L.marker([p.lat,p.lon],{icon,keyboard:true,title:p.zh,zIndexOffset:1000}).addTo(layer);
+    m.on("click",()=>{ if(all) select(a.key,true); showCard(s.p); });
+    pins.push({m,p,half:w/2,dir:null,small:all});
+    pts.push([p.lat,p.lon]);
+  });
+  if(pts.length === 1) map.setView(pts[0],15); else map.fitBounds(pts,{padding:[44,44],maxZoom:16});
+  placeLabels(); updateStationLabels();
+}
+function placeLabels(){
+  if(!map) return;
+  const w = map.getSize().x, zoomed = map.getZoom() >= 14;
+  pins.forEach(pin=>{
+    const x = map.latLngToContainerPoint(pin.m.getLatLng()).x, est = 18 + pin.p.zh.length * 14, gap = pin.half + 4;
+    let dir = pin.p.dir === "left" ? "left" : "right";
+    if(dir === "right" && x + gap + est > w - 6 && x - gap - est >= 6) dir = "left";
+    if(dir === "left" && x - gap - est < 6) dir = "right";
+    const perm = !pin.small || zoomed, key = dir + perm;
+    if(pin.dir === key) return;
+    pin.dir = key; pin.m.unbindTooltip();
+    pin.m.bindTooltip(pin.p.zh,{permanent:perm,direction:dir,offset:[dir==="left"?-pin.half:pin.half,0],className:"lbl",interactive:false});
+  });
+}
+function showCard(id){
+  document.querySelectorAll(".card[data-p]").forEach(el=>el.classList.toggle("hl",el.dataset.p===id));
+  const el = document.querySelector(`.card[data-p="${id}"]`);
+  if(!el) return;
+  const smooth = !(window.matchMedia && matchMedia("(prefers-reduced-motion:reduce)").matches);
+  el.scrollIntoView({behavior:smooth?"smooth":"auto",block:"center"});
+}
+function select(k,user){
+  cur = TABS.find(a=>a.key===k) || TABS[0];
+  document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected",t.dataset.k===cur.key));
+  document.getElementById("title").textContent = cur.key === "all" ? "全部景點" : `${cur.name}：${cur.sub}`;
+  const note = document.getElementById("note");
+  note.textContent = cur.note || ""; note.hidden = !cur.note;
+  renderList(); drawPins();
+  if(user){ store("vanGuideTab",cur.key); history.replaceState(null,"","#"+cur.key); document.getElementById("t-"+cur.key).scrollIntoView({block:"nearest",inline:"center"}); }
+}
+function initLocate(){
+  document.getElementById("locBtn").addEventListener("click",()=>{
+    if(!navigator.geolocation){ setStatus("這個瀏覽器不支援定位。點卡片上的導航按鈕，Google 地圖會從你的位置規劃路線。"); return; }
+    firstFix = true; setStatus("定位中…");
+    map.locate({watch:true,enableHighAccuracy:true,setView:false});
+  });
+  map.on("locationfound",e=>{
+    if(!meMarker){
+      meCircle = L.circle(e.latlng,{radius:e.accuracy,color:"#1a73e8",weight:1,fillOpacity:.12,interactive:false}).addTo(map);
+      meMarker = L.marker(e.latlng,{icon:L.divIcon({className:"me",iconSize:[18,18],iconAnchor:[9,9]}),title:"我的位置",zIndexOffset:2000}).addTo(map);
+    } else { meMarker.setLatLng(e.latlng); meCircle.setLatLng(e.latlng).setRadius(e.accuracy); }
+    if(firstFix){ map.setView(e.latlng, Math.max(map.getZoom(),15)); firstFix = false; }
+    setStatus(`已顯示目前位置（誤差約 ${Math.round(e.accuracy)} 公尺）。`);
+  });
+  map.on("locationerror",()=>setStatus("無法取得定位：請允許瀏覽器使用位置。也可以直接點卡片上的導航按鈕。"));
+}
+(function start(){
+  renderTabs(); renderLegend();
+  try{ initMap(); initLocate(); }
+  catch(e){ map = null; document.getElementById("map").innerHTML = '<p style="padding:16px">地圖載入失敗。下方景點和導航仍可使用。</p>'; }
+  const hash = location.hash.replace("#","");
+  const k = TABS.some(a=>a.key===hash) ? hash : store("vanGuideTab");
+  select(k || "all",false);
+  document.getElementById("t-"+cur.key).scrollIntoView({block:"nearest",inline:"center"});
+})();
+</script>
+</body>
+</html>

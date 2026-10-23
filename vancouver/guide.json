@@ -1,0 +1,999 @@
+{
+ "areas": [
+  {
+   "key": "downtown",
+   "name": "市中心",
+   "sub": "Waterfront・Gastown・科學館",
+   "note": "Canada Line、Expo Line 都到 Waterfront 站，市中心景點多半步行可達。Gastown 沿 Water St 往西逛；不要往東走過 Carrall St，East Hastings St 一帶盡量避開。",
+   "spots": [
+    {
+     "p": "flyover",
+     "m": "walk",
+     "tags": [
+      "室內",
+      "網購"
+     ],
+     "d": "Canada Place 裡的球幕飛行體驗，座椅會動，飛越加拿大各地景色，約 30 分鐘。身高 102 cm 以上才能搭。季節會換主題片（例如 10 月萬聖節版），官網查當期內容。Waterfront 站步行約 5 分鐘。"
+    },
+    {
+     "p": "steamclock",
+     "m": "walk",
+     "tags": [
+      "免費"
+     ],
+     "d": "Gastown 地標，每 15 分鐘鳴笛一次。Waterfront 站沿 Water St 步行約 10 分鐘，附近石板街有很多咖啡店和紀念品店。"
+    },
+    {
+     "p": "lookout",
+     "m": "walk",
+     "tags": [
+      "室內"
+     ],
+     "d": "Harbour Centre 頂樓 360 度觀景台，搭外牆玻璃電梯上去。門票當天可重複入場，白天、夜景都能看。Waterfront 站步行約 3 分鐘。"
+    },
+    {
+     "p": "vpl",
+     "m": "walk",
+     "tags": [
+      "免費",
+      "室內"
+     ],
+     "d": "羅馬競技場造型的中央圖書館，免費入館，兒童區很大，頂樓有空中花園。下雨天的好去處。Expo Line Granville 站或 Canada Line Vancouver City Centre 站步行約 5 分鐘。"
+    },
+    {
+     "p": "sunyatsen",
+     "m": "walk",
+     "tags": [],
+     "d": "唐人街裡的明式蘇州庭園，有導覽。旁邊的中山公園公共區免費。從 Gastown 步行約 10 分鐘；這一帶天黑後少逗留。"
+    },
+    {
+     "p": "science",
+     "m": "expo",
+     "tags": [
+      "室內",
+      "網購",
+      "親子"
+     ],
+     "d": "False Creek 旁的球形科學館，大量互動展區和科學秀，小孩可以玩大半天，館內有餐廳。Expo Line Main Street–Science World 站出站即到（Waterfront 搭 4 站約 7 分鐘）。"
+    }
+   ]
+  },
+  {
+   "key": "stanley",
+   "name": "史丹利公園",
+   "sub": "水族館・馬車・海灘",
+   "note": "公園很大，用走的很難逛完。水族館和馬車上車點相鄰，可排同一天；從市中心搭 Uber 約 10 分鐘，或搭 19 號公車到 Stanley Park 再步行。Coal Harbour 海堤可看水上飛機起降。",
+   "spots": [
+    {
+     "p": "aquarium",
+     "m": "uber",
+     "tags": [
+      "室內",
+      "網購",
+      "親子"
+     ],
+     "d": "加拿大最大的水族館，有海獺、海獅、企鵝和 4D 劇場。票價依日期浮動，先網購。秋季常有萬聖節主題活動，官網查當期內容。館內有餐廳。"
+    },
+    {
+     "p": "carriage",
+     "m": "walk",
+     "tags": [
+      "親子"
+     ],
+     "d": "約 1 小時馬車導覽繞公園一圈，會停靠圖騰柱等景點，不用自己走遠路。上車點在遊客中心旁，離水族館步行約 5 分鐘。季節營運（大約 3–11 月），通常不用預約，到售票亭排班次。"
+    },
+    {
+     "p": "totem",
+     "m": "walk",
+     "tags": [
+      "免費"
+     ],
+     "d": "原住民圖騰柱群，史丹利公園最常被拍的景點之一。可沿海堤步道走過去，或搭馬車時停靠。"
+    },
+    {
+     "p": "englishbay",
+     "m": "uber",
+     "tags": [
+      "免費"
+     ],
+     "d": "史丹利公園南側的沙灘，看海、看夕陽。旁邊 Denman St 餐廳很多。從水族館 Uber 約 5 分鐘。"
+    }
+   ]
+  },
+  {
+   "key": "granville",
+   "name": "固蘭湖島",
+   "sub": "市場・兒童市場・太空館",
+   "note": "固蘭湖島和隔壁 Vanier Park 的太空館、海事博物館適合排同一天。島上停車難，建議 Uber，或搭 Canada Line 到 Yaletown–Roundhouse 站，步行約 10 分鐘到碼頭轉彩虹小渡輪（False Creek Ferries／Aquabus，單程大人約 $4.5–8，不能用捷運票）。",
+   "spots": [
+    {
+     "p": "gimarket",
+     "m": "walk",
+     "tags": [
+      "室內"
+     ],
+     "d": "室內公共市場，蔬果、海鮮、巧達濃湯、甜點和熟食攤，適合當午餐。"
+    },
+    {
+     "p": "kidsmarket",
+     "m": "walk",
+     "tags": [
+      "室內",
+      "親子"
+     ],
+     "d": "整棟都是玩具店和兒童遊戲區，就在 Public Market 附近。"
+    },
+    {
+     "p": "gibrewing",
+     "m": "walk",
+     "tags": [],
+     "d": "加拿大最早的精釀啤酒廠之一，有 Taproom 和伴手禮店。附近步行 2 分鐘內還有 The Liberty Distillery（威士忌、琴酒蒸餾廠）和 Artisan SakeMaker（手工清酒）。"
+    },
+    {
+     "p": "space",
+     "m": "uber",
+     "tags": [
+      "室內",
+      "親子"
+     ],
+     "d": "天象劇場、太空艙和天文互動展。平日開放時間較短（約 10:00–15:00），先去太空館再到固蘭湖島比較順。Vanier Park 碼頭也有小渡輪到島上。"
+    },
+    {
+     "p": "maritime",
+     "m": "walk",
+     "tags": [
+      "室內"
+     ],
+     "d": "太空館隔壁，可以登上二戰時期的 St. Roch 號木帆船。"
+    }
+   ]
+  },
+  {
+   "key": "south",
+   "name": "城南花園",
+   "sub": "Bloedel 溫室・VanDusen",
+   "note": "兩處都在溫哥華市區南邊，可排半天。下雨去 Bloedel 室內溫室，晴天去 VanDusen。",
+   "spots": [
+    {
+     "p": "bloedel",
+     "m": "uber",
+     "tags": [
+      "室內"
+     ],
+     "d": "伊莉莎白女王公園山頂的圓頂溫室，熱帶植物和放養的鸚鵡。公園本身免費，山頂可眺望市區。Canada Line King Edward 站步行約 15 分鐘（上坡），或 Uber。"
+    },
+    {
+     "p": "vandusen",
+     "m": "uber",
+     "tags": [
+      "親子"
+     ],
+     "d": "大型植物園，有樹籬迷宮。秋季常有南瓜、萬聖節佈置活動，官網查當期內容。建議 Uber 或公車。"
+    }
+   ]
+  },
+  {
+   "key": "north",
+   "name": "北溫",
+   "sub": "吊橋・Lonsdale Quay",
+   "note": "從 Waterfront 站搭 SeaBus 渡輪約 12 分鐘到 Lonsdale Quay，用一般捷運票即可。吊橋在山區，雨天步道濕滑，穿防滑鞋。",
+   "spots": [
+    {
+     "p": "lonsdale",
+     "m": "ferry",
+     "tags": [
+      "室內"
+     ],
+     "d": "SeaBus 碼頭旁的市場，可吃東西、看溫哥華市區天際線。"
+    },
+    {
+     "p": "capilano",
+     "m": "uber",
+     "tags": [
+      "網購"
+     ],
+     "d": "最有名的收費吊橋，還有樹頂步道和懸崖步道。網購通常較便宜；旺季有從市區出發的免費接駁車，出發前查官網班次。"
+    },
+    {
+     "p": "lynn",
+     "m": "uber",
+     "tags": [
+      "免費"
+     ],
+     "d": "免費的吊橋和森林步道，人比 Capilano 少。從 Lonsdale Quay 搭公車或 Uber。"
+    }
+   ]
+  },
+  {
+   "key": "richmond",
+   "name": "Richmond",
+   "sub": "商場・Outlet・公園",
+   "note": "機場所在的城市，華人多，中餐選擇非常多。Canada Line 從市區往南分兩條：往 Richmond–Brighouse 的車才停 Aberdeen、Lansdowne；往 YVR 的車在 Bridgeport 後轉往機場。搭錯在 Bridgeport 換車。",
+   "spots": [
+    {
+     "p": "aberdeenC",
+     "m": "canada",
+     "tags": [
+      "室內"
+     ],
+     "d": "港式商場，美食街選擇多，有 Daiso。Canada Line Aberdeen 站對面。"
+    },
+    {
+     "p": "richcentre",
+     "m": "canada",
+     "tags": [
+      "室內"
+     ],
+     "d": "Richmond 最大的傳統商場，連鎖品牌齊全。Canada Line 終點 Richmond–Brighouse 站旁。"
+    },
+    {
+     "p": "outlet",
+     "m": "canada",
+     "tags": [
+      "室內"
+     ],
+     "d": "機場旁的歐式購物村，有遮雨走廊、兒童遊樂區和美食區。Canada Line 機場支線 Templeton 站出站即到。"
+    },
+    {
+     "p": "costco",
+     "m": "uber",
+     "tags": [],
+     "d": "加拿大 Costco 只收 Mastercard（信用卡），台灣會員卡可用。適合買水果、零食和伴手禮。"
+    },
+    {
+     "p": "oval",
+     "m": "uber",
+     "tags": [
+      "室內",
+      "親子"
+     ],
+     "d": "2010 冬奧速滑館裡的運動體驗館，有滑雪跳台、雪車等互動模擬，小孩可以放電。"
+    },
+    {
+     "p": "naturepark",
+     "m": "uber",
+     "tags": [
+      "免費",
+      "親子"
+     ],
+     "d": "木棧道繞森林和沼澤，約 1 小時，有小型自然館。秋季週末偶有萬聖節步道活動，查官網。"
+    },
+    {
+     "p": "flightpath",
+     "m": "uber",
+     "tags": [
+      "免費",
+      "親子"
+     ],
+     "d": "機場跑道頭旁的小公園，飛機從頭頂低空降落。戶外沒有遮雨。"
+    },
+    {
+     "p": "metrotown",
+     "m": "expo",
+     "tags": [
+      "室內"
+     ],
+     "d": "在 Burnaby，大溫哥華最大的室內商場。Expo Line Metrotown 站直達。"
+    }
+   ]
+  },
+  {
+   "key": "steveston",
+   "name": "Steveston",
+   "sub": "漁村・海濱公園",
+   "note": "Richmond 西南角的老漁村，從 Richmond 市區 Uber 約 20 分鐘，或搭 Canada Line 到 Richmond–Brighouse 轉 402／407 等公車。以下景點彼此步行可達，排半天剛好。",
+   "spots": [
+    {
+     "p": "steveston",
+     "m": "walk",
+     "tags": [
+      "免費"
+     ],
+     "d": "漁人碼頭可向漁船直接買海鮮，碼頭邊很多炸魚薯條店。"
+    },
+    {
+     "p": "garrypoint",
+     "m": "walk",
+     "tags": [
+      "免費",
+      "親子"
+     ],
+     "d": "海邊大草地，散步、放風箏、看夕陽。碼頭步行約 10 分鐘。"
+    },
+    {
+     "p": "cannery",
+     "m": "walk",
+     "tags": [
+      "室內",
+      "親子"
+     ],
+     "d": "國家歷史遺址，介紹鮭魚罐頭工業，有互動展。"
+    },
+    {
+     "p": "britannia",
+     "m": "walk",
+     "tags": [
+      "免費"
+     ],
+     "d": "沿海堤往東走，保留下來的造船廠和工人宿舍，免費參觀。"
+    }
+   ]
+  }
+ ],
+ "places": {
+  "flyover": {
+   "n": "FlyOver Canada",
+   "zh": "FlyOver Canada",
+   "lat": 49.2888,
+   "lon": -123.1111,
+   "q": "FlyOver Canada, 201-999 Canada Pl, Vancouver, BC",
+   "fee": "大人約 $35（網購）｜小孩約 $26｜身高 102 cm 以上才能搭",
+   "buy": "https://www.experienceflyover.com/vancouver/"
+  },
+  "steamclock": {
+   "n": "Gastown Steam Clock",
+   "zh": "Gastown 蒸汽鐘",
+   "lat": 49.2844,
+   "lon": -123.1089,
+   "q": "Gastown Steam Clock, 305 Water St, Vancouver, BC"
+  },
+  "lookout": {
+   "n": "Vancouver Lookout",
+   "zh": "Vancouver Lookout 觀景台",
+   "lat": 49.28461,
+   "lon": -123.11232,
+   "q": "Vancouver Lookout, 555 W Hastings St, Vancouver, BC",
+   "dir": "left",
+   "fee": "大人約 $20–23｜小孩約 $16｜5 歲以下免費｜當天可重複入場"
+  },
+  "vpl": {
+   "n": "Vancouver Public Library Central Branch",
+   "zh": "溫哥華中央圖書館",
+   "lat": 49.2797,
+   "lon": -123.1156,
+   "q": "Vancouver Public Library Central Branch, 350 W Georgia St, Vancouver, BC"
+  },
+  "sunyatsen": {
+   "n": "Dr. Sun Yat-Sen Classical Chinese Garden",
+   "zh": "中山公園（唐人街）",
+   "lat": 49.2798,
+   "lon": -123.1036,
+   "q": "Dr. Sun Yat-Sen Classical Chinese Garden, 578 Carrall St, Vancouver, BC",
+   "fee": "大人約 $16｜6–17 歲約 $12｜6 歲以下免費｜家庭票（2 大 3 小）約 $32"
+  },
+  "science": {
+   "n": "Science World",
+   "zh": "Science World 科學館",
+   "lat": 49.2736,
+   "lon": -123.1039,
+   "q": "Science World, 1455 Quebec St, Vancouver, BC",
+   "fee": "大人約 $37｜小孩 3–12 歲約 $26｜3 歲以下免費",
+   "buy": "https://www.scienceworld.ca/"
+  },
+  "aquarium": {
+   "n": "Vancouver Aquarium",
+   "zh": "溫哥華水族館",
+   "lat": 49.3006,
+   "lon": -123.1308,
+   "q": "Vancouver Aquarium, 845 Avison Way, Vancouver, BC",
+   "fee": "大人約 $40–55（依日期浮動）｜小孩 3–12 歲約便宜 $15｜3 歲以下免費",
+   "buy": "https://www.vanaqua.org/"
+  },
+  "carriage": {
+   "n": "Stanley Park Horse-Drawn Tours",
+   "zh": "史丹利公園馬車",
+   "lat": 49.29795,
+   "lon": -123.13068,
+   "q": "Stanley Park Horse-Drawn Tours, Stanley Park Information Booth, Stanley Park Dr, Vancouver, BC",
+   "dir": "left",
+   "fee": "大人約 $45｜小孩 2–12 歲約 $20"
+  },
+  "totem": {
+   "n": "Brockton Point Totem Poles",
+   "zh": "Brockton Point 圖騰柱",
+   "lat": 49.2994,
+   "lon": -123.1209,
+   "q": "Brockton Point Totem Poles, Stanley Park, Vancouver, BC"
+  },
+  "englishbay": {
+   "n": "English Bay Beach",
+   "zh": "English Bay 海灘",
+   "lat": 49.28648,
+   "lon": -123.14371,
+   "q": "English Bay Beach, Beach Ave, Vancouver, BC"
+  },
+  "gimarket": {
+   "n": "Granville Island Public Market",
+   "zh": "Granville Island 公共市場",
+   "lat": 49.2727,
+   "lon": -123.1352,
+   "q": "Granville Island Public Market, 1669 Johnston St, Vancouver, BC"
+  },
+  "kidsmarket": {
+   "n": "Granville Island Kids Market",
+   "zh": "Kids Market 兒童市場",
+   "lat": 49.2706,
+   "lon": -123.1339,
+   "q": "Granville Island Kids Market, 1496 Cartwright St, Vancouver, BC",
+   "dir": "bottom"
+  },
+  "gibrewing": {
+   "n": "Granville Island Brewing",
+   "zh": "固蘭湖島啤酒廠",
+   "lat": 49.2705,
+   "lon": -123.1357,
+   "q": "Granville Island Brewing, 1441 Cartwright St, Vancouver, BC",
+   "fee": "免費參觀 | 啤酒品飲組 (Flights) 另計",
+   "buy": "https://www.granvilleislandbrewing.ca/en-CA/visit-us"
+  },
+  "space": {
+   "n": "H.R. MacMillan Space Centre",
+   "zh": "太空館 Space Centre",
+   "lat": 49.2763,
+   "lon": -123.1446,
+   "q": "H.R. MacMillan Space Centre, 1100 Chestnut St, Vancouver, BC",
+   "fee": "大人 $27.50｜小孩 5–11 歲 $19.60｜5 歲以下免費｜家庭票（最多 5 人）$85.35"
+  },
+  "maritime": {
+   "n": "Vancouver Maritime Museum",
+   "zh": "海事博物館",
+   "lat": 49.27748,
+   "lon": -123.14777,
+   "q": "Vancouver Maritime Museum, 1905 Ogden Ave, Vancouver, BC",
+   "dir": "left",
+   "fee": "大人 $22｜學生／青少年 $17.50｜5 歲以下免費｜家庭票（2 大 4 小）$48.50"
+  },
+  "bloedel": {
+   "n": "Bloedel Conservatory",
+   "zh": "Bloedel 溫室",
+   "lat": 49.2416,
+   "lon": -123.1126,
+   "q": "Bloedel Conservatory, 4600 Cambie St, Vancouver, BC",
+   "fee": "大人 $9.50｜小孩 5–12 歲 $4.75｜4 歲以下免費"
+  },
+  "vandusen": {
+   "n": "VanDusen Botanical Garden",
+   "zh": "VanDusen 植物園",
+   "lat": 49.23962,
+   "lon": -123.13259,
+   "q": "VanDusen Botanical Garden, 5251 Oak St, Vancouver, BC",
+   "dir": "left",
+   "fee": "大人約 $14–16｜小孩 5–12 歲約 $8｜4 歲以下免費"
+  },
+  "lonsdale": {
+   "n": "Lonsdale Quay Market",
+   "zh": "Lonsdale Quay 市場",
+   "lat": 49.3101,
+   "lon": -123.0832,
+   "q": "Lonsdale Quay Market, 123 Carrie Cates Ct, North Vancouver, BC"
+  },
+  "capilano": {
+   "n": "Capilano Suspension Bridge Park",
+   "zh": "Capilano 吊橋",
+   "lat": 49.3429,
+   "lon": -123.1149,
+   "q": "Capilano Suspension Bridge Park, 3735 Capilano Rd, North Vancouver, BC",
+   "fee": "大人約 $72–80｜小孩 6–12 歲約 $25–28｜5 歲以下免費｜網購較便宜",
+   "buy": "https://www.capbridge.com/tickets-and-hours/"
+  },
+  "lynn": {
+   "n": "Lynn Canyon Park",
+   "zh": "Lynn Canyon 吊橋（免費）",
+   "lat": 49.3443,
+   "lon": -123.0186,
+   "q": "Lynn Canyon Park Suspension Bridge, North Vancouver, BC"
+  },
+  "aberdeenC": {
+   "n": "Aberdeen Centre",
+   "zh": "Aberdeen Centre 商場",
+   "lat": 49.1838,
+   "lon": -123.1332,
+   "q": "Aberdeen Centre, 4151 Hazelbridge Way, Richmond, BC",
+   "dir": "left"
+  },
+  "richcentre": {
+   "n": "CF Richmond Centre",
+   "zh": "Richmond Centre 商場",
+   "lat": 49.1665,
+   "lon": -123.1385,
+   "q": "CF Richmond Centre, 6551 No. 3 Rd, Richmond, BC"
+  },
+  "outlet": {
+   "n": "McArthurGlen Designer Outlet Vancouver Airport",
+   "zh": "機場 Outlet",
+   "lat": 49.1977,
+   "lon": -123.1449,
+   "q": "McArthurGlen Designer Outlet Vancouver Airport, 7899 Templeton Station Rd, Richmond, BC",
+   "fee": "逛街免費。注意：從 Templeton 站往市區方向搭車，大人要多付機場附加費 $6.50"
+  },
+  "costco": {
+   "n": "Costco Richmond",
+   "zh": "Richmond Costco",
+   "lat": 49.1953,
+   "lon": -123.111,
+   "q": "Costco Wholesale, 9151 Bridgeport Rd, Richmond, BC"
+  },
+  "oval": {
+   "n": "Richmond Olympic Experience",
+   "zh": "Richmond 奧運體驗館",
+   "lat": 49.1745,
+   "lon": -123.1525,
+   "q": "Richmond Olympic Experience, 6111 River Rd, Richmond, BC",
+   "fee": "大人約 $16｜小孩約 $6"
+  },
+  "naturepark": {
+   "n": "Richmond Nature Park",
+   "zh": "Richmond 自然公園",
+   "lat": 49.17348,
+   "lon": -123.09725,
+   "q": "Richmond Nature Park, 11851 Westminster Hwy, Richmond, BC"
+  },
+  "flightpath": {
+   "n": "Larry Berg Flight Path Park",
+   "zh": "看飛機公園",
+   "lat": 49.18398,
+   "lon": -123.14898,
+   "q": "Larry Berg Flight Path Park, Richmond, BC",
+   "dir": "left"
+  },
+  "metrotown": {
+   "n": "Metropolis at Metrotown",
+   "zh": "Metrotown 商場",
+   "lat": 49.2276,
+   "lon": -122.9993,
+   "q": "Metropolis at Metrotown, 4700 Kingsway, Burnaby, BC"
+  },
+  "steveston": {
+   "n": "Steveston Fisherman's Wharf",
+   "zh": "Steveston 漁人碼頭",
+   "lat": 49.1247,
+   "lon": -123.1838,
+   "q": "Steveston Fisherman's Wharf, Richmond, BC"
+  },
+  "garrypoint": {
+   "n": "Garry Point Park",
+   "zh": "Garry Point 海濱公園",
+   "lat": 49.1256,
+   "lon": -123.1937,
+   "q": "Garry Point Park, Richmond, BC"
+  },
+  "cannery": {
+   "n": "Gulf of Georgia Cannery",
+   "zh": "喬治亞灣罐頭工廠",
+   "lat": 49.12473,
+   "lon": -123.18695,
+   "q": "Gulf of Georgia Cannery National Historic Site, 12138 4th Ave, Richmond, BC",
+   "fee": "大人約 $14.75｜17 歲以下免費"
+  },
+  "britannia": {
+   "n": "Britannia Shipyards",
+   "zh": "Britannia 造船廠",
+   "lat": 49.12085,
+   "lon": -123.1702,
+   "q": "Britannia Shipyards National Historic Site, 5180 Westwater Dr, Richmond, BC"
+  }
+ },
+ "stations": {
+  "WF": {
+   "n": "Waterfront",
+   "lat": 49.28583,
+   "lon": -123.11167,
+   "key": true
+  },
+  "BUR": {
+   "n": "Burrard",
+   "lat": 49.28562,
+   "lon": -123.12016,
+   "key": false
+  },
+  "GRV": {
+   "n": "Granville",
+   "lat": 49.28278,
+   "lon": -123.11667,
+   "key": false
+  },
+  "STC": {
+   "n": "Stadium–Chinatown",
+   "lat": 49.27944,
+   "lon": -123.10944,
+   "key": true
+  },
+  "MSW": {
+   "n": "Main Street–Science World",
+   "lat": 49.27306,
+   "lon": -123.10028,
+   "key": true
+  },
+  "CB": {
+   "n": "Commercial–Broadway",
+   "lat": 49.2625,
+   "lon": -123.06889,
+   "key": true
+  },
+  "NAN": {
+   "n": "Nanaimo",
+   "lat": 49.24818,
+   "lon": -123.05564,
+   "key": false
+  },
+  "A29": {
+   "n": "29th Avenue",
+   "lat": 49.24408,
+   "lon": -123.04593,
+   "key": false
+  },
+  "JC": {
+   "n": "Joyce–Collingwood",
+   "lat": 49.23835,
+   "lon": -123.0317,
+   "key": false
+  },
+  "PAT": {
+   "n": "Patterson",
+   "lat": 49.22972,
+   "lon": -123.0125,
+   "key": false
+  },
+  "MT": {
+   "n": "Metrotown",
+   "lat": 49.22546,
+   "lon": -123.00318,
+   "key": true
+  },
+  "RO": {
+   "n": "Royal Oak",
+   "lat": 49.22,
+   "lon": -122.98838,
+   "key": false
+  },
+  "ED": {
+   "n": "Edmonds",
+   "lat": 49.21205,
+   "lon": -122.95923,
+   "key": false
+  },
+  "S22": {
+   "n": "22nd Street",
+   "lat": 49.2,
+   "lon": -122.94917,
+   "key": false
+  },
+  "NW": {
+   "n": "New Westminster",
+   "lat": 49.20135,
+   "lon": -122.91272,
+   "key": false
+  },
+  "COL": {
+   "n": "Columbia",
+   "lat": 49.20476,
+   "lon": -122.90616,
+   "key": false
+  },
+  "SR": {
+   "n": "Scott Road",
+   "lat": 49.20444,
+   "lon": -122.87417,
+   "key": false
+  },
+  "GW": {
+   "n": "Gateway",
+   "lat": 49.19889,
+   "lon": -122.85056,
+   "key": false
+  },
+  "SC": {
+   "n": "Surrey Central",
+   "lat": 49.18944,
+   "lon": -122.84778,
+   "key": false
+  },
+  "KG": {
+   "n": "King George",
+   "lat": 49.18278,
+   "lon": -122.84472,
+   "key": false
+  },
+  "SAP": {
+   "n": "Sapperton",
+   "lat": 49.22443,
+   "lon": -122.88964,
+   "key": false
+  },
+  "BRA": {
+   "n": "Braid",
+   "lat": 49.23322,
+   "lon": -122.88283,
+   "key": false
+  },
+  "LTC": {
+   "n": "Lougheed Town Centre",
+   "lat": 49.24846,
+   "lon": -122.89702,
+   "key": true
+  },
+  "PWU": {
+   "n": "Production Way–University",
+   "lat": 49.25333,
+   "lon": -122.91806,
+   "key": false
+  },
+  "VCCL": {
+   "n": "VCC–Clark",
+   "lat": 49.26575,
+   "lon": -123.07883,
+   "key": false
+  },
+  "REN": {
+   "n": "Renfrew",
+   "lat": 49.25889,
+   "lon": -123.04528,
+   "key": false
+  },
+  "RUP": {
+   "n": "Rupert",
+   "lat": 49.26083,
+   "lon": -123.03278,
+   "key": false
+  },
+  "GIL": {
+   "n": "Gilmore",
+   "lat": 49.26489,
+   "lon": -123.01351,
+   "key": false
+  },
+  "BTC": {
+   "n": "Brentwood Town Centre",
+   "lat": 49.26639,
+   "lon": -123.00167,
+   "key": true
+  },
+  "HOL": {
+   "n": "Holdom",
+   "lat": 49.26472,
+   "lon": -122.98222,
+   "key": false
+  },
+  "SBL": {
+   "n": "Sperling–Burnaby Lake",
+   "lat": 49.25914,
+   "lon": -122.96391,
+   "key": false
+  },
+  "LCW": {
+   "n": "Lake City Way",
+   "lat": 49.25458,
+   "lon": -122.93903,
+   "key": false
+  },
+  "BQ": {
+   "n": "Burquitlam",
+   "lat": 49.26139,
+   "lon": -122.88972,
+   "key": false
+  },
+  "MC": {
+   "n": "Moody Centre",
+   "lat": 49.27806,
+   "lon": -122.84583,
+   "key": false
+  },
+  "IC": {
+   "n": "Inlet Centre",
+   "lat": 49.27722,
+   "lon": -122.82778,
+   "key": false
+  },
+  "CC": {
+   "n": "Coquitlam Central",
+   "lat": 49.27389,
+   "lon": -122.8,
+   "key": false
+  },
+  "LIN": {
+   "n": "Lincoln",
+   "lat": 49.28043,
+   "lon": -122.79392,
+   "key": false
+  },
+  "LLD": {
+   "n": "Lafarge Lake–Douglas",
+   "lat": 49.28556,
+   "lon": -122.79167,
+   "key": false
+  },
+  "VCC": {
+   "n": "Vancouver City Centre",
+   "lat": 49.28202,
+   "lon": -123.11875,
+   "key": false
+  },
+  "YR": {
+   "n": "Yaletown–Roundhouse",
+   "lat": 49.27455,
+   "lon": -123.1219,
+   "key": true
+  },
+  "OV": {
+   "n": "Olympic Village",
+   "lat": 49.26639,
+   "lon": -123.11583,
+   "key": false
+  },
+  "BCH": {
+   "n": "Broadway–City Hall",
+   "lat": 49.26278,
+   "lon": -123.11444,
+   "key": true
+  },
+  "KE": {
+   "n": "King Edward",
+   "lat": 49.24917,
+   "lon": -123.11583,
+   "key": true
+  },
+  "OAK": {
+   "n": "Oakridge–41st Avenue",
+   "lat": 49.23306,
+   "lon": -123.11667,
+   "key": false
+  },
+  "LAN": {
+   "n": "Langara–49th Avenue",
+   "lat": 49.22639,
+   "lon": -123.11611,
+   "key": false
+  },
+  "MD": {
+   "n": "Marine Drive",
+   "lat": 49.20972,
+   "lon": -123.11694,
+   "key": false
+  },
+  "BP": {
+   "n": "Bridgeport",
+   "lat": 49.19556,
+   "lon": -123.12611,
+   "key": true
+  },
+  "CAP": {
+   "n": "Capstan",
+   "lat": 49.18925,
+   "lon": -123.13168,
+   "key": false
+  },
+  "AB": {
+   "n": "Aberdeen",
+   "lat": 49.18389,
+   "lon": -123.13639,
+   "key": true
+  },
+  "LD": {
+   "n": "Lansdowne",
+   "lat": 49.17472,
+   "lon": -123.13639,
+   "key": false
+  },
+  "RB": {
+   "n": "Richmond–Brighouse",
+   "lat": 49.16806,
+   "lon": -123.13639,
+   "key": false
+  },
+  "TP": {
+   "n": "Templeton",
+   "lat": 49.19667,
+   "lon": -123.14639,
+   "key": false
+  },
+  "SIC": {
+   "n": "Sea Island Centre",
+   "lat": 49.19306,
+   "lon": -123.15806,
+   "key": false
+  },
+  "YVRS": {
+   "n": "YVR–Airport",
+   "lat": 49.19417,
+   "lon": -123.17833,
+   "key": true
+  }
+ },
+ "lines": [
+  {
+   "id": "expo",
+   "n": "Expo Line",
+   "color": "#1D59AF",
+   "stops": [
+    "WF",
+    "BUR",
+    "GRV",
+    "STC",
+    "MSW",
+    "CB",
+    "NAN",
+    "A29",
+    "JC",
+    "PAT",
+    "MT",
+    "RO",
+    "ED",
+    "S22",
+    "NW",
+    "COL",
+    "SR",
+    "GW",
+    "SC",
+    "KG"
+   ]
+  },
+  {
+   "id": "expo",
+   "n": "Expo Line（Production Way 支線）",
+   "color": "#1D59AF",
+   "stops": [
+    "COL",
+    "SAP",
+    "BRA",
+    "LTC",
+    "PWU"
+   ]
+  },
+  {
+   "id": "millennium",
+   "n": "Millennium Line",
+   "color": "#F2C500",
+   "stops": [
+    "VCCL",
+    "CB",
+    "REN",
+    "RUP",
+    "GIL",
+    "BTC",
+    "HOL",
+    "SBL",
+    "LCW",
+    "PWU",
+    "LTC",
+    "BQ",
+    "MC",
+    "IC",
+    "CC",
+    "LIN",
+    "LLD"
+   ]
+  },
+  {
+   "id": "canada",
+   "n": "Canada Line",
+   "color": "#0098C9",
+   "stops": [
+    "WF",
+    "VCC",
+    "YR",
+    "OV",
+    "BCH",
+    "KE",
+    "OAK",
+    "LAN",
+    "MD",
+    "BP",
+    "CAP",
+    "AB",
+    "LD",
+    "RB"
+   ]
+  },
+  {
+   "id": "canada",
+   "n": "Canada Line（機場支線）",
+   "color": "#0098C9",
+   "stops": [
+    "BP",
+    "TP",
+    "SIC",
+    "YVRS"
+   ]
+  }
+ ]
+}
